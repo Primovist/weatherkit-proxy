@@ -85,7 +85,7 @@ export async function Response($request, $response, context = {}) {
         case "text/json":
         case "application/json":
             body = JSON.parse($response.body);
-            Console.log(`[Apple Response] ${url.pathname}`, JSON.stringify(body, null, 2));
+            Console.debug(`[Apple Response] ${url.pathname}`, body);
             switch (url.hostname) {
                 case "weatherkit.apple.com":
                     // 路径判断
@@ -416,12 +416,12 @@ async function InjectAirQuality(airQuality, Settings, Caches, enviroments, preFe
     const pollutantMetadata = injectedPollutants?.metadata;
     const indexMetadata = injectedIndex?.metadata;
     const comparisonMetadata = injectedComparison?.metadata;
-    
+
     const pName = needPollutants && pollutantMetadata && !pollutantMetadata.temporarilyUnavailable ? pollutantMetadata.providerName : null;
     const iName = needInjectIndex && indexMetadata && !indexMetadata.temporarilyUnavailable ? indexMetadata.providerName : null;
     const cName = needInjectComparison && comparisonMetadata && !comparisonMetadata.temporarilyUnavailable ? comparisonMetadata.providerName : null;
 
-    let providers = [];
+    const providers = [];
     if (pName && pName === iName && (!cName || pName === cName)) {
         // 如果各环节提供商都一致（或者没开启部分注入），则合并展示，去除多余的“污染物”、“指数”前缀
         providers.push(AirQuality.appendScaleToProviderName(injectedIndex, Settings));
@@ -448,7 +448,7 @@ async function InjectAirQuality(airQuality, Settings, Caches, enviroments, preFe
         pollutants: AirQuality.ConvertPollutants(airQuality, injectedPollutants, needInjectIndex, injectedIndex, Settings) ?? [],
         previousDayComparison: injectedComparison?.previousDayComparison ?? AirQuality.Config.CompareCategoryIndexes.UNKNOWN,
     };
-    Console.debug(`airQuality: ${JSON.stringify(airQuality, null, 2)}`);
+    Console.debug("airQuality:", airQuality);
     return airQuality;
 }
 

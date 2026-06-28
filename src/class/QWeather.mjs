@@ -132,7 +132,7 @@ export default class QWeather {
         } catch (error) {
             Console.error(`GeoAPI: ${error}`);
         } finally {
-            Console.debug(`metadata: ${JSON.stringify(metadata, null, 2)}`);
+            Console.debug("metadata:", metadata);
             Console.info("✅ GeoAPI");
         }
         return metadata;
@@ -197,7 +197,6 @@ export default class QWeather {
         }
         return currentWeather;
     }
-
 
     async #AirQualityCurrent() {
         Console.info("☑️ AirQualityCurrent");
@@ -598,7 +597,7 @@ export default class QWeather {
      */
     #CreatePollutants(pollutantsObj, scaleCode) {
         Console.info("☑️ CreatePollutants");
-        Console.debug(`pollutantsObj: ${JSON.stringify(pollutantsObj)}`);
+        Console.debug("pollutantsObj:", pollutantsObj);
 
         // TODO: what is ppmC? https://dev.qweather.com/docs/resource/air-info/#pollutants
         const pollutants = pollutantsObj
@@ -634,7 +633,7 @@ export default class QWeather {
      */
     #CreatePollutantsV7(pollutantsObj) {
         Console.info("☑️ CreatePollutantsV7");
-        Console.debug(`pollutantsObj: ${JSON.stringify(pollutantsObj)}`);
+        Console.debug("pollutantsObj:", pollutantsObj);
 
         const { mgm3, ugm3 } = AirQuality.Config.Units.WeatherKit;
         const pollutants = Object.entries(pollutantsObj)
@@ -804,7 +803,7 @@ export default class QWeather {
     }
 
     async YesterdayAirQuality(locationInfo) {
-        Console.info("☑️ YesterdayAirQuality", `locationInfo ${JSON.stringify(locationInfo)}`);
+        Console.info("☑️ YesterdayAirQuality", "locationInfo:", locationInfo);
         const failedAirQuality = {
             metadata: this.#Metadata(undefined, undefined, true),
             categoryIndex: -1,
@@ -835,7 +834,7 @@ export default class QWeather {
         const pollutants = this.#CreatePollutantsV7(historicalAir.airHourly[hour]);
         Console.debug(`hour: ${hour}`, `index: ${index}`);
 
-        Console.info("✅ YesterdayAirQuality", `pollutants: ${JSON.stringify(pollutants)}`, `categoryIndex: ${categoryIndex}`);
+        Console.info("✅ YesterdayAirQuality", "pollutants:", pollutants, "categoryIndex:", categoryIndex);
         return {
             metadata: this.#Metadata(historicalAir.fxLink),
             categoryIndex,

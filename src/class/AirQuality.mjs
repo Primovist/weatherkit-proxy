@@ -45,7 +45,7 @@ export default class AirQuality {
         const failedCategoryIndex = -1;
 
         if (!categories?.ranges || !Array.isArray(categories.ranges) || categories.ranges.length === 0) {
-            Console.debug(`categories: ${JSON.stringify(categories)}`);
+            Console.debug("categories:", categories);
             Console.error("GetPrimaryPollutant", "categories无效");
             return failedCategoryIndex;
         }
@@ -400,7 +400,7 @@ export default class AirQuality {
     static appendScaleToProviderName(airQuality, Settings) {
         const fullProviderName = airQuality?.metadata?.providerName;
         if (!fullProviderName) return "";
-        
+
         const parts = fullProviderName.split("\n");
         const providerName = parts[0].trim();
         const suffix = parts.length > 1 ? `\n${parts.slice(1).join("\n")}` : "";
@@ -492,7 +492,7 @@ export default class AirQuality {
                   const [minAmount, maxAmount] = amounts;
                   return AirQuality.#CeilByPrecision(pollutant.amount, minAmount) >= minAmount && AirQuality.#CeilByPrecision(pollutant.amount, maxAmount) <= maxAmount;
               });
-        Console.debug(`indexes: ${JSON.stringify(indexes)}`, `amounts: ${JSON.stringify(amounts)}`);
+        Console.debug("indexes:", indexes, "amounts:", amounts);
 
         const [minIndex, maxIndex] = indexes;
         const [minAmount, maxAmount] = amounts;
@@ -540,7 +540,7 @@ export default class AirQuality {
         const failedPollutant = { pollutantType: "NOT_AVAILABLE", index: -1, categoryIndex: -1 };
 
         if (!Array.isArray(pollutants) || pollutants.length === 0) {
-            Console.debug(`pollutants: ${JSON.stringify(pollutants)}`);
+            Console.debug("pollutants:", pollutants);
             Console.error("PrimaryPollutant", "pollutants无效");
             return failedPollutant;
         }
@@ -554,7 +554,7 @@ export default class AirQuality {
             .sort((a, b) => b.index - a.index);
 
         if (indexesWithCategory.length === 0) {
-            Console.debug(`pollutants: ${JSON.stringify(pollutants)}`, `indexesWithCategory: ${JSON.stringify(indexesWithCategory)}`);
+            Console.debug("pollutants:", pollutants, "indexesWithCategory:", indexesWithCategory);
             Console.error("PrimaryPollutant", "找不到有效的index");
             return failedPollutant;
         }
@@ -568,7 +568,7 @@ export default class AirQuality {
         }
 
         const primaryPollutant = primaryPollutants[0];
-        Console.info("✅ PrimaryPollutant", `primaryPollutant: ${JSON.stringify(primaryPollutant)}`);
+        Console.info("✅ PrimaryPollutant", "primaryPollutant:", primaryPollutant);
         return primaryPollutant;
     }
 
@@ -618,7 +618,7 @@ export default class AirQuality {
         const allowOverRange = options?.allowOverRange ?? true;
 
         if (!Array.isArray(pollutants) || pollutants.length === 0) {
-            Console.debug(`pollutants: ${JSON.stringify(pollutants)}`);
+            Console.debug("pollutants:", pollutants);
             Console.error("PollutantsToAirQuality", "pollutants无效");
             return { metadata: { providerName: "iRingo", temporarilyUnavailable: true } };
         }
@@ -629,7 +629,7 @@ export default class AirQuality {
         }
 
         newPollutants = AirQuality.#PollutantsToIndexes(newPollutants, scale.pollutants);
-        Console.debug("PollutantsToAirQuality", `convertedPollutants: ${JSON.stringify(newPollutants)}`);
+        Console.debug("PollutantsToAirQuality", "convertedPollutants:", newPollutants);
 
         const primaryPollutant = AirQuality.PrimaryPollutant(newPollutants, scale.categories);
         const maxIndex = scale?.weatherKitScale?.maxIndex;
