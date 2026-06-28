@@ -18,7 +18,7 @@ export default class ColorfulClouds {
     }
 
     #cache = {
-        realtime: {},
+        realtimePromise: null,
         yesterdayHourly: undefined,
     };
 
@@ -113,42 +113,28 @@ export default class ColorfulClouds {
     async #RealTime() {
         Console.info("☑️ RealTime");
 
-        if (this.#cache.realtime?.result?.realtime?.status === "ok") {
-            Console.info("✅ RealTime", "Using cache");
-            return this.#cache.realtime;
-        }
-
-        const request = {
-            url: `${this.endpoint}/realtime`,
-            headers: this.headers,
-        };
-        try {
-            const body = await fetch(request).then(response => JSON.parse(response?.body ?? "{}"));
-            switch (body?.status) {
-                case "ok":
-                    switch (body?.result?.realtime?.status) {
-                        case "ok": {
-                            this.#cache.realtime = body;
-                            Console.info("✅ RealTime");
-                            return body;
-                        }
-                        case "error":
-                        case undefined:
-                            throw Error(JSON.stringify({ status: body?.result?.realtime?.status, reason: body?.result?.realtime }));
+        if (!this.#cache.realtimePromise) {
+            const request = {
+                url: `${this.endpoint}/realtime`,
+                headers: this.headers,
+            };
+            this.#cache.realtimePromise = fetch(request)
+                .then(response => JSON.parse(response?.body ?? "{}"))
+                .then(body => {
+                    if (body?.status === "ok" && body?.result?.realtime?.status === "ok") {
+                        return body;
                     }
-                    break;
-                case "error":
-                case "failed":
-                case undefined:
                     throw Error(JSON.stringify(body ?? {}));
-            }
-        } catch (error) {
-            Console.error(`RealTime: ${error}`);
-        } finally {
-            //Console.debug(`airQuality: ${JSON.stringify(airQuality, null, 2)}`);
-            Console.info("✅ RealTime");
+                })
+                .catch(error => {
+                    Console.error(`RealTime: ${error}`);
+                    this.#cache.realtimePromise = null;
+                    return {};
+                });
+        } else {
+            Console.info("✅ RealTime", "Using cache promise");
         }
-        return {};
+        return this.#cache.realtimePromise;
     }
 
     async Minutely() {

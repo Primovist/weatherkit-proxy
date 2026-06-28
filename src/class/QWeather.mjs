@@ -19,7 +19,7 @@ export default class QWeather {
     }
 
     #cache = {
-        airQualityCurrent: {},
+        airQualityCurrentPromise: null,
         historicalAir: null,
     };
 
@@ -201,32 +201,28 @@ export default class QWeather {
     async #AirQualityCurrent() {
         Console.info("☑️ AirQualityCurrent");
 
-        if (this.#cache.airQualityCurrent?.metadata?.tag && !this.#cache.airQualityCurrent?.error) {
-            Console.info("✅ AirQualityCurrent", "Using cache");
-            return this.#cache.airQualityCurrent;
-        }
-
-        const request = {
-            url: `${this.endpoint}/airquality/v1/current/${this.latitude}/${this.longitude}`,
-            headers: this.headers,
-        };
-        try {
-            const body = await fetch(request).then(response => JSON.parse(response?.body ?? "{}"));
-            switch (body?.error) {
-                case undefined: {
-                    this.#cache.airQualityCurrent = body;
-                    return body;
-                }
-                default:
+        if (!this.#cache.airQualityCurrentPromise) {
+            const request = {
+                url: `${this.endpoint}/airquality/v1/current/${this.latitude}/${this.longitude}`,
+                headers: this.headers,
+            };
+            this.#cache.airQualityCurrentPromise = fetch(request)
+                .then(response => JSON.parse(response?.body ?? "{}"))
+                .then(body => {
+                    if (body?.error === undefined) {
+                        return body;
+                    }
                     throw Error(JSON.stringify(body?.error, null, 2));
-            }
-        } catch (error) {
-            Console.error(`AirQualityCurrent: ${error}`);
-        } finally {
-            //Console.debug(`airQuality: ${JSON.stringify(airQuality, null, 2)}`);
-            Console.info("✅ AirQualityCurrent");
+                })
+                .catch(error => {
+                    Console.error(`AirQualityCurrent: ${error}`);
+                    this.#cache.airQualityCurrentPromise = null;
+                    return {};
+                });
+        } else {
+            Console.info("✅ AirQualityCurrent", "Using cache promise");
         }
-        return {};
+        return this.#cache.airQualityCurrentPromise;
     }
 
     async Minutely() {
