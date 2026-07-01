@@ -37,8 +37,7 @@ export async function Response($request, $response, context = {}) {
      * @type {{Settings: import('../types').Settings}}
      */
     const { Settings, Configs } = preSettings ? { Settings: preSettings, Configs: preConfigs } : buildSettings(database);
-    // 注意：不在此处设置 Console.logLevel，Console 是模块级单例，
-    // 设置会跨请求污染。日志级别由 database.mjs 中的默认值决定。
+
     // 创建空数据
     let body = {};
     // airQualityScale 请求：Apple 200 直接透传，404 则本地构建

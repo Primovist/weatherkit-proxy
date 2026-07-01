@@ -1,115 +1,17 @@
-export class Console {
-    static #level = 3;
+const LEVELS = { OFF: 0, ERROR: 1, WARN: 2, INFO: 3, DEBUG: 4, ALL: 5 };
 
-    static #formatMsg = msg => {
-        return msg.map(item => {
-            if (typeof item === "object" && item !== null) {
-                try {
-                    return JSON.stringify(item, null, 2);
-                } catch {
-                    return item;
-                }
-            }
-            return item;
-        });
-    };
+// 日志级别在部署时固定，不支持运行时修改（避免跨请求污染）
+// 如需调整，修改此处或在 database.mjs 中同步调整 LogLevel 默认值
+const LEVEL = LEVELS.INFO;
 
-    static #shouldSkip = msg => {
-        if (Console.#level < 4) {
-            const first = msg[0];
-            if (typeof first === "string" && (first.startsWith("☑️") || first.startsWith("✅"))) {
-                return true;
-            }
-        }
-        return false;
-    };
+const fmt = msg =>
+    msg.map(m => (typeof m === "object" && m !== null ? JSON.stringify(m, null, 2) : m));
 
-    static debug = (...msg) => {
-        if (Console.#level < 4) return;
-        console.debug(...Console.#formatMsg(msg));
-    };
-
-    static info = (...msg) => {
-        if (Console.#level < 3) return;
-        if (Console.#shouldSkip(msg)) return;
-        console.info(...Console.#formatMsg(msg));
-    };
-
-    static warn = (...msg) => {
-        if (Console.#level < 2) return;
-        console.warn(...Console.#formatMsg(msg));
-    };
-
-    static error = (...msg) => {
-        if (Console.#level < 1) return;
-        const formatted = msg.map(item => (item instanceof Error ? (item.stack ?? item.message) : item));
-        console.error(...Console.#formatMsg(formatted));
-    };
-
-    static exception = (...msg) => Console.error(...msg);
-
-    static log = (...msg) => {
-        if (Console.#level === 0) return;
-        if (Console.#shouldSkip(msg)) return;
-        console.log(...Console.#formatMsg(msg));
-    };
-
-    static get logLevel() {
-        switch (Console.#level) {
-            case 0:
-                return "OFF";
-            case 1:
-                return "ERROR";
-            case 2:
-                return "WARN";
-            case 3:
-            default:
-                return "INFO";
-            case 4:
-                return "DEBUG";
-            case 5:
-                return "ALL";
-        }
-    }
-
-    static set logLevel(level) {
-        if (typeof level === "string") {
-            level = level.toLowerCase();
-        }
-        switch (level) {
-            case 0:
-            case "off":
-                Console.#level = 0;
-                break;
-            case 1:
-            case "error":
-                Console.#level = 1;
-                break;
-            case 2:
-            case "warn":
-            case "warning":
-            default:
-                Console.#level = 2;
-                break;
-            case 3:
-            case "info":
-                Console.#level = 3;
-                break;
-            case 4:
-            case "debug":
-                Console.#level = 4;
-                break;
-            case 5:
-            case "all":
-                Console.#level = 5;
-                break;
-        }
-    }
-
-    static clear = () => console.clear();
-    static count = label => console.count(label);
-    static countReset = label => console.countReset(label);
-    static time = label => console.time(label);
-    static timeEnd = label => console.timeEnd(label);
-    static timeLog = (label, ...args) => console.timeLog(label, ...args);
-}
+export const Console = {
+    debug:     (...msg) => { if (LEVEL >= LEVELS.DEBUG) console.debug(...fmt(msg)); },
+    info:      (...msg) => { if (LEVEL >= LEVELS.INFO)  console.info(...fmt(msg));  },
+    warn:      (...msg) => { if (LEVEL >= LEVELS.WARN)  console.warn(...fmt(msg));  },
+    error:     (...msg) => { if (LEVEL >= LEVELS.ERROR) console.error(...fmt(msg)); },
+    log:       (...msg) => { if (LEVEL >  LEVELS.OFF)   console.log(...fmt(msg));   },
+    exception: (...msg) => { if (LEVEL >= LEVELS.ERROR) console.error(...fmt(msg)); },
+};
