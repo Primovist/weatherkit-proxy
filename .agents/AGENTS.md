@@ -1,4 +1,4 @@
-# WeatherKit-Worker 代理项目开发规则与记忆
+# WeatherKit-Proxy 代理项目开发规则与记忆
 
 这是一个针对 Apple WeatherKit 的代理重写项目。为了维护项目的超轻量、极简且易于维护的设计，所有开发必须遵守以下规则和规范：
 

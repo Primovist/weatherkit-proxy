@@ -30,7 +30,7 @@ export function renderIndex(host, protocol) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WeatherKit-Worker 代理配置中心</title>
+    <title>WeatherKit-Proxy 代理配置中心</title>
     <link rel="icon" type="image/png" href="https://developer.apple.com/assets/elements/icons/weatherkit/weatherkit-128x128.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -559,7 +559,7 @@ export function renderIndex(host, protocol) {
             <img class="logo" src="https://developer.apple.com/assets/elements/icons/weatherkit/weatherkit-128x128.png" alt="WeatherKit Logo">
             <div class="header-text">
                 <h1>
-                    <span class="title-brand">meme's<br>WeatherKit-Worker</span>
+                    <span class="title-brand">meme's<br>WeatherKit-Proxy</span>
                     <span class="title-main">配置中心</span>
                 </h1>
             </div>
@@ -818,7 +818,7 @@ export function renderIndex(host, protocol) {
             <p>
                By MemeStudio
                 •
-                <a href="https://github.com/meme-lau/weatherkit-worker" target="_blank" rel="noopener noreferrer">GitHub</a>
+                <a href="https://github.com/meme-lau/weatherkit-proxy" target="_blank" rel="noopener noreferrer">GitHub</a>
                 •
                 基于 <a href="https://nsringo.github.io/guide/Weather/weather-kit" target="_blank" rel="noopener noreferrer">iRingo</a> 优化重构
             </p>

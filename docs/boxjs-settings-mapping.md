@@ -1,6 +1,6 @@
 # BoxJS 配置项与系统默认参数映射说明
 
-在 WeatherKit-Worker 项目中，原版运行于本地代理软件（如 Surge、Loon、Quantumult X）上的 BoxJS 订阅配置面板参数，已经固化为云端 Workers 部署的底层默认预设。本文档详细说明了这些参数在项目中的映射路径、默认配置以及合并规则。
+在 WeatherKit-Proxy 项目中，原版运行于本地代理软件（如 Surge、Loon、Quantumult X）上的 BoxJS 订阅配置面板参数，已经固化为云端 Workers 部署的底层默认预设。本文档详细说明了这些参数在项目中的映射路径、默认配置以及合并规则。
 
 ## 1. 配置加载与合并优先级
 

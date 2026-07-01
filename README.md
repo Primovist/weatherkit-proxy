@@ -1,4 +1,4 @@
-# <img src="https://developer.apple.com/assets/elements/icons/weatherkit/weatherkit-128x128.png" width="32" height="32" align="center"> WeatherKit-Worker
+# <img src="https://developer.apple.com/assets/elements/icons/weatherkit/weatherkit-128x128.png" width="32" height="32" align="center"> WeatherKit-Proxy
 
 这是一个对 [NSRingo/WeatherKit](https://github.com/NSRingo/WeatherKit) 进行重构与改造的项目，使其支持自主独立部署在 **Cloudflare Workers** 与 **Vercel**。移除了所有本地繁琐的脚本代理依赖，提供一键独立部署与代理配置的动态下载。
 
@@ -13,7 +13,7 @@
 1. 登录您的 [Cloudflare 仪表板](https://dash.cloudflare.com/)。
 2. 依次进入 **Workers 和 Pages** -> **创建** -> **克隆 Git 存储库**。
 3. 在 **Git 存储库 URL** 输入框中，直接填入本项目的 Git 地址：
-   `https://github.com/meme-lau/weatherkit-worker.git`
+   `https://github.com/meme-lau/weatherkit-proxy.git`
 4. 点击 **下一步**，Cloudflare 将在云端自动完成打包构建并为您分配部署的 Workers 域名。
 
 #### 方式 2：通过本地命令行部署（适合开发者）
@@ -23,8 +23,8 @@
 
 ##### 2. 克隆项目与安装依赖
 ```bash
-git clone https://github.com/meme-lau/weatherkit-worker.git
-cd weatherkit-worker
+git clone https://github.com/meme-lau/weatherkit-proxy.git
+cd weatherkit-proxy
 npm install
 ```
 

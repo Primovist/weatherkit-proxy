@@ -1,9 +1,9 @@
 // 此文件由自动生成的配置整理得出，存储了各代理软件规则的静态资源对象，请勿手动修改。
 export default {
-    "config.sgmodule": `#!name = WeatherKit-Worker
-#!desc = 本项目是对 NSRingo/WeatherKit 的自托管优化重构版本。支持独立自部署至 Cloudflare Workers。\\n1.解锁全部天气功能\\n2.替换空气质量数据\\n3.添加下一小时降水数据\\n4.添加天气数据
+    "config.sgmodule": `#!name = WeatherKit-Proxy
+#!desc = 本项目是对 NSRingo/WeatherKit 的自托管优化重构版本。支持独立自部署至 Cloudflare Workers / Vercel。\\n1.解锁全部天气功能\\n2.替换空气质量数据\\n3.添加下一小时降水数据\\n4.添加天气数据
 #!author = meme[https://github.com/meme]
-#!homepage = https://github.com/meme-lau/weatherkit-worker
+#!homepage = https://github.com/meme-lau/weatherkit-proxy
 #!icon = https://developer.apple.com/assets/elements/icons/weatherkit/weatherkit-128x128.png
 #!date = __DATE__
 
@@ -40,10 +40,10 @@ DOMAIN,tether.edge.apple,REJECT-DROP
 [MITM]
 hostname = %APPEND% weatherkit.apple.com`,
 
-    "config.plugin": `#!name = WeatherKit-Worker
-#!desc = 本项目是对 NSRingo/WeatherKit 的自托管优化重构版本。支持独立自部署至 Cloudflare Workers。\\n1.解锁全部天气功能\\n2.替换空气质量数据\\n3.添加下一小时降水数据\\n4.添加天气数据
+    "config.plugin": `#!name = WeatherKit-Proxy
+#!desc = 本项目是对 NSRingo/WeatherKit 的自托管优化重构版本。支持独立自部署至 Cloudflare Workers / Vercel。\\n1.解锁全部天气功能\\n2.替换空气质量数据\\n3.添加下一小时降水数据\\n4.添加天气数据
 #!author = meme[https://github.com/meme]
-#!homepage = https://github.com/meme-lau/weatherkit-worker
+#!homepage = https://github.com/meme-lau/weatherkit-proxy
 #!icon = https://developer.apple.com/assets/elements/icons/weatherkit/weatherkit-128x128.png
 #!system = iOS,iPadOS,macOS,watchOS
 #!date = __DATE__
@@ -82,10 +82,10 @@ DOMAIN,tether.edge.apple,REJECT-DROP
 [MITM]
 hostname = weatherkit.apple.com`,
 
-    "config.srmodule": `#!name = WeatherKit-Worker
-#!desc = 本项目是对 NSRingo/WeatherKit 的自托管优化重构版本。支持独立自部署至 Cloudflare Workers。\\n1.解锁全部天气功能\\n2.替换空气质量数据\\n3.添加下一小时降水数据\\n4.添加天气数据
+    "config.srmodule": `#!name = WeatherKit-Proxy
+#!desc = 本项目是对 NSRingo/WeatherKit 的自托管优化重构版本。支持独立自部署至 Cloudflare Workers / Vercel。\\n1.解锁全部天气功能\\n2.替换空气质量数据\\n3.添加下一小时降水数据\\n4.添加天气数据
 #!author = meme[https://github.com/meme]
-#!homepage = https://github.com/meme-lau/weatherkit-worker
+#!homepage = https://github.com/meme-lau/weatherkit-proxy
 #!icon = https://developer.apple.com/assets/elements/icons/weatherkit/weatherkit-128x128.png
 #!date = __DATE__
 
@@ -122,16 +122,16 @@ DOMAIN,tether.edge.apple,REJECT-DROP
 [MITM]
 hostname = %APPEND% weatherkit.apple.com`,
 
-    "config.stoverride": `name: "WeatherKit-Worker"
+    "config.stoverride": `name: "WeatherKit-Proxy"
 desc: |-
-  本项目是对 NSRingo/WeatherKit 的自托管优化重构版本。支持独立自部署至 Cloudflare Workers。
+  本项目是对 NSRingo/WeatherKit 的自托管优化重构版本。支持独立自部署至 Cloudflare Workers / Vercel。
   1.解锁全部天气功能
   2.替换空气质量数据
   3.添加下一小时降水数据
   4.添加天气数据
 author: |-
   meme[https://github.com/meme]
-homepage: "https://github.com/meme-lau/weatherkit-worker"
+homepage: "https://github.com/meme-lau/weatherkit-proxy"
 icon: "https://developer.apple.com/assets/elements/icons/weatherkit/weatherkit-128x128.png"
 date: "__DATE__"
 
@@ -166,15 +166,15 @@ http:
   - ^https?:\\/\\/weatherkit\\.apple\\.com\\/api\\/v2\\/weather\\/ https://__HOST__/api/v2/weather/ transparent`,
 
     "config.yaml": `# Date: __DATE__
-name: 'WeatherKit-Worker'
+name: 'WeatherKit-Proxy'
 description: |-
-  本项目是对 NSRingo/WeatherKit 的自托管优化重构版本。支持独立自部署至 Cloudflare Workers。
+  本项目是对 NSRingo/WeatherKit 的自托管优化重构版本。支持独立自部署至 Cloudflare Workers / Vercel。
   1.解锁全部天气功能
   2.替换空气质量数据
   3.添加下一小时降水数据
   4.添加天气数据
 author: meme
-homepage: https://github.com/meme-lau/weatherkit-worker
+homepage: https://github.com/meme-lau/weatherkit-proxy
 icon: https://developer.apple.com/assets/elements/icons/weatherkit/weatherkit-128x128.png
 dns: {}
 rules:
