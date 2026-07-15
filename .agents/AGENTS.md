@@ -9,7 +9,7 @@
 
 ## 2. 路由与功能模块
 * **Hono Worker 适配**：必须使用 `src/class/HonoWorkerAdapter.mjs` 统一包装 Hono 的请求与响应回写。
-* **独立部署与配置下载**：通过 `/conf/:filename` 接口动态向客户端下发代理配置文件，服务会自动将配置文件中占位符 `__HOST__` 替换为当前的 Worker 部署域名。
+* **独立部署与配置下载**：通过 `/conf/:filename` 接口动态向客户端下发代理配置文件，服务会自动将占位符 `__HOST__`（携带 base64 配置路径，仅 `api/v2/weather` 使用）与 `__PLAIN_HOST__`（裸部署域名，其余接口使用）替换为当前 Worker 部署域名。
 
 ## 3. 空气质量与第三方 API 数据源
 * **彩云天气**：默认天气与空气质量数据源。空气质量数据源已精简并切换为彩云天气的国标实时监测数据（`WAQI_InstantCast_CN`）。

@@ -19,9 +19,9 @@ host, tether.edge.apple, reject
 
 [rewrite_local]
 # 🌤 WeatherKit.api.v1.availability.response
-^https?:\\/\\/weatherkit\\.apple\\.com\\/api\\/v1\\/availability\\/(.*) url 307 https://__HOST__/api/v1/availability/$1
+^https?:\\/\\/weatherkit\\.apple\\.com\\/api\\/v1\\/availability\\/(.*) url 307 https://__PLAIN_HOST__/api/v1/availability/$1
 # 🌤 WeatherKit.api.v1.airQualityScale.response
-^https?:\\/\\/weatherkit\\.apple\\.com\\/api\\/v1\\/airQualityScale\\/(.*) url 307 https://__HOST__/api/v1/airQualityScale/$1
+^https?:\\/\\/weatherkit\\.apple\\.com\\/api\\/v1\\/airQualityScale\\/(.*) url 307 https://__PLAIN_HOST__/api/v1/airQualityScale/$1
 # 🌤 WeatherKit.api.v2.weather.response
 ^https?:\\/\\/weatherkit\\.apple\\.com\\/api\\/v2\\/weather\\/(.*) url 307 https://__HOST__/api/v2/weather/$1
 

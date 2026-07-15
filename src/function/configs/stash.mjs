@@ -38,6 +38,6 @@ http:
   mitm:
   - "weatherkit.apple.com"
   url-rewrite:
-  - ^https?:\\/\\/weatherkit\\.apple\\.com\\/api\\/v1\\/availability\\/ https://__HOST__/api/v1/availability/ transparent
-  - ^https?:\\/\\/weatherkit\\.apple\\.com\\/api\\/v1\\/airQualityScale\\/ https://__HOST__/api/v1/airQualityScale/ transparent
+  - ^https?:\\/\\/weatherkit\\.apple\\.com\\/api\\/v1\\/availability\\/ https://__PLAIN_HOST__/api/v1/availability/ transparent
+  - ^https?:\\/\\/weatherkit\\.apple\\.com\\/api\\/v1\\/airQualityScale\\/ https://__PLAIN_HOST__/api/v1/airQualityScale/ transparent
   - ^https?:\\/\\/weatherkit\\.apple\\.com\\/api\\/v2\\/weather\\/ https://__HOST__/api/v2/weather/ transparent`;

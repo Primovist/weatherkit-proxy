@@ -63,8 +63,11 @@ async function handleConfigDownload(c, filename, configParam) {
     }
 
     // 动态替换默认的主机名占位符
+    // __HOST__：携带 base64 配置路径（host/p/<config>），仅 api/v2/weather 等需要逐用户配置的接口使用；
+    // __PLAIN_HOST__：裸主机（不含配置路径），availability/airQualityScale 等无需配置的接口使用。
     const domainOnly = host.split(":")[0];
-    let content = configContent.replaceAll("__HOST__", targetHost);
+    let content = configContent.replaceAll("__PLAIN_HOST__", host);
+    content = content.replaceAll("__HOST__", targetHost);
     content = content.replaceAll("__DOMAIN__", domainOnly);
     content = content.replaceAll("__DATE__", cstDateString);
 

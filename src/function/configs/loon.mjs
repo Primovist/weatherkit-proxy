@@ -32,9 +32,9 @@ DOMAIN,tether.edge.apple,REJECT-DROP
 
 [URL Rewrite]
 # 🌤 WeatherKit.api.v1.availability.response
-^https?:\\/\\/weatherkit\\.apple\\.com\\/api\\/v1\\/availability\\/ https://__HOST__/api/v1/availability/ header
+^https?:\\/\\/weatherkit\\.apple\\.com\\/api\\/v1\\/availability\\/ https://__PLAIN_HOST__/api/v1/availability/ header
 # 🌤 WeatherKit.api.v1.airQualityScale.response
-^https?:\\/\\/weatherkit\\.apple\\.com\\/api\\/v1\\/airQualityScale\\/ https://__HOST__/api/v1/airQualityScale/ header
+^https?:\\/\\/weatherkit\\.apple\\.com\\/api\\/v1\\/airQualityScale\\/ https://__PLAIN_HOST__/api/v1/airQualityScale/ header
 # 🌤 WeatherKit.api.v2.weather.response
 ^https?:\\/\\/weatherkit\\.apple\\.com\\/api\\/v2\\/weather\\/ https://__HOST__/api/v2/weather/ header
 
