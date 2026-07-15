@@ -71,7 +71,7 @@ sequenceDiagram
   天气拦截响应的核心业务流，统筹控制所有数据注入逻辑（`InjectCurrentWeather`、`InjectForecastDaily`、`InjectForecastHourly`、`InjectForecastNextHour`、`InjectAirQuality`）。
 * **[src/function/](file:///Users/meme/Developer/weatherkit-proxy/src/function/)**
   * **[indexPage.mjs](file:///Users/meme/Developer/weatherkit-proxy/src/function/indexPage.mjs)**: 炫酷的控制面板页面（Web UI），通过无状态的纯前端 Base64 保存参数，安全并方便导入各主流网络工具。
-  * **[configs.mjs](file:///Users/meme/Developer/weatherkit-proxy/src/function/configs.mjs)**: 包含各大网络客户端（Surge, Loon, Stash, Shadowrocket 等）的配置模版，自动在请求下载时替换域名为当前 Workers 地址。
+  * **[configs/](file:///Users/meme/Developer/weatherkit-proxy/src/function/configs/)**: 按客户端拆分维护的代理配置模版（Surge、Shadowrocket、Loon、Stash、Egern、Quantumult X 各一个 .mjs），由 [index.mjs](file:///Users/meme/Developer/weatherkit-proxy/src/function/configs/index.mjs) 聚合为 `{ 文件名: 配置内容 }`；经 `/conf/:filename` 下载时自动替换 `__HOST__`/`__DOMAIN__`/`__DATE__` 占位符为当前部署地址。
 
 ---
 

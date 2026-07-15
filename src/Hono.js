@@ -2,13 +2,13 @@ import { Hono } from "hono/tiny";
 import ColorfulClouds from "./class/ColorfulClouds.mjs";
 import HonoWorkerAdapter from "./class/HonoWorkerAdapter.mjs";
 import QWeather from "./class/QWeather.mjs";
-import configs from "./function/configs.mjs";
+import buildSettings from "./function/buildSettings.mjs";
+import configs from "./function/configs/index.mjs";
 import database from "./function/database.mjs";
 import { renderIndex } from "./function/indexPage.mjs";
 import parseWeatherKitURL from "./function/parseWeatherKitURL.mjs";
-import buildSettings from "./function/buildSettings.mjs";
 import { Response } from "./process/Response.mjs";
-import { set, merge, fetch, requestContext } from "./utils/index.mjs";
+import { fetch, merge, requestContext, set } from "./utils/index.mjs";
 
 function getCSTDateString() {
     const d = new Date(Date.now() + 8 * 60 * 60 * 1000);
@@ -22,6 +22,18 @@ function getCSTDateString() {
 }
 
 const app = new Hono();
+
+// 路径白名单守卫：仅放行首页、配置下载与 WeatherKit API 代理路径，其余一律返回 404。
+// 与下方 catch-all 路由 /:rest{.*} 配合：白名单内路径继续走后续路由，其余在进入路由前即被拦截。
+const ALLOWED_PATH_PREFIXES = ["/conf/", "/p/", "/api/v1/availability/", "/api/v1/airQualityScale/", "/api/v2/weather/"];
+
+app.use("*", async (c, next) => {
+    const { pathname } = new URL(c.req.url);
+    if (pathname === "/" || ALLOWED_PATH_PREFIXES.some(prefix => pathname.startsWith(prefix))) {
+        return next();
+    }
+    return c.text("Not Found", 404);
+});
 
 // 根路径路由，返回配置列表及一键导入可视化页面
 app.get("/", async c => {
@@ -190,13 +202,22 @@ async function handleWeatherRequest(c, queryArguments = {}) {
     });
 }
 
+// 将 URL 中的 base64 配置解码为对象。
+// 兼容标准 base64 与 URL 安全的 base64（base64url）：
+// 新链接使用 base64url（不含 "/" "+" 与 "=" 填充），旧链接与已下发到设备上的配置可能是标准 base64，需一并兼容。
+function decodeBase64Config(str) {
+    let s = str.replace(/-/g, "+").replace(/_/g, "/");
+    while (s.length % 4) s += "=";
+    return decodeURIComponent(escape(atob(s)));
+}
+
 // 带配置前缀的请求路由
 app.all("/p/:configBase64/:rest{.*}", async c => {
     const configBase64 = c.req.param("configBase64");
     let queryArguments = {};
     try {
         if (configBase64) {
-            const decoded = decodeURIComponent(escape(atob(configBase64)));
+            const decoded = decodeBase64Config(configBase64);
             queryArguments = JSON.parse(decoded);
         }
     } catch (e) {

@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node --input-type=module -e ' *)",
+      "Bash(node /tmp/gen_configs.mjs)"
+    ],
+    "additionalDirectories": [
+      "/tmp",
+      "/private/tmp"
+    ]
+  }
+}

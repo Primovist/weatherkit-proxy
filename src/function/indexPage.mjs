@@ -1,9 +1,13 @@
 function minify(html) {
     // 压缩 CSS
     html = html.replace(/<style>([\s\S]*?)<\/style>/g, (match, css) => {
-        return `<style>${css.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\s+/g, " ").replace(/\s*([\{\}:;])\s*/g, "$1").trim()}</style>`;
+        return `<style>${css
+            .replace(/\/\*[\s\S]*?\*\//g, "")
+            .replace(/\s+/g, " ")
+            .replace(/\s*([{}:;])\s*/g, "$1")
+            .trim()}</style>`;
     });
-    
+
     // 压缩 HTML（避开 <script>）
     const parts = html.split(/(<\/script>|<script[^>]*>)/i);
     let inScript = false;
@@ -878,6 +882,12 @@ export function renderIndex(host, protocol) {
                 icon: "https://fastly.jsdelivr.net/gh/NSRingo/engineering-solutions@main/packages/doc-ui/src/module-install/icons/egern.png",
                 filename: "weatherkit-proxy.yaml",
                 scheme: "egern:///modules/new?url="
+            },
+            {
+                name: "Quantumult X",
+                icon: "https://fastly.jsdelivr.net/gh/NSRingo/engineering-solutions@main/packages/doc-ui/src/module-install/icons/qx.png",
+                filename: "weatherkit-proxy.snippet",
+                scheme: ""
             }
         ];
 
@@ -1035,7 +1045,25 @@ export function renderIndex(host, protocol) {
             }
         }
 
-        // 计算当前表单参数 of Base64 编码
+        // 将 JSON 配置编码为 URL 安全的 base64（base64url）。
+        // 标准 base64 含有 "/" 与 "+"，放入 URL 路径会被当作分隔符截断、
+        // 放入 query 会被 URLSearchParams 把 "+" 解码成空格，因此改用 base64url。
+        function encodeBase64Url(str) {
+            return btoa(unescape(encodeURIComponent(str)))
+                .replace(/\+/g, "-")
+                .replace(/\//g, "_")
+                .replace(/=+$/, "");
+        }
+
+        // 兼容标准 base64 与 base64url 的解码，并补齐可能缺失的 padding。
+        // 旧的分享链接与已下发到设备上的配置可能仍是标准 base64，需一并兼容。
+        function decodeBase64Url(str) {
+            let s = str.replace(/-/g, "+").replace(/_/g, "/");
+            while (s.length % 4) s += "=";
+            return decodeURIComponent(escape(atob(s)));
+        }
+
+        // 计算 URL 中的 base64 编码配置
         function getBase64Config() {
             let config = {};
             if (currentPreset === "Caiyun") {
@@ -1179,7 +1207,7 @@ export function renderIndex(host, protocol) {
             
             try {
                 const jsonStr = JSON.stringify(config);
-                return btoa(unescape(encodeURIComponent(jsonStr)));
+                return encodeBase64Url(jsonStr);
             } catch (e) {
                 console.error("Base64 encode error:", e);
                 return "";
@@ -1436,7 +1464,7 @@ export function renderIndex(host, protocol) {
             
             if (configStr) {
                 try {
-                    const decoded = JSON.parse(decodeURIComponent(escape(atob(configStr))));
+                    const decoded = JSON.parse(decodeBase64Url(configStr));
                     applyConfig(decoded);
                     localStorage.setItem("weatherkit_config", JSON.stringify(decoded));
                     showToast("已载入链接中备份的天气配置");
