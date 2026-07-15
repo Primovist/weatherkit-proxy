@@ -887,7 +887,10 @@ export function renderIndex(host, protocol) {
                 name: "Quantumult X",
                 icon: "https://fastly.jsdelivr.net/gh/NSRingo/engineering-solutions@main/packages/doc-ui/src/module-install/icons/qx.png",
                 filename: "weatherkit-proxy.snippet",
-                scheme: ""
+                scheme: "quantumult-x:///add-resource?remote-resource=",
+                // schemeWrap 指定把下载链接包装进 {"<键>":[downloadUrl]} 后整体 encodeURIComponent，
+                // 对应 QX 的 add-resource?remote-resource= 接口（rewrite_remote 远程重写资源）。
+                schemeWrap: "rewrite_remote"
             }
         ];
 
@@ -1237,7 +1240,11 @@ export function renderIndex(host, protocol) {
             const downloadUrl = base64 
                 ? baseUrl + '/conf/' + base64 + '/' + item.filename 
                 : baseUrl + '/conf/' + item.filename;
-            const importUrl = item.scheme ? item.scheme + encodeURIComponent(downloadUrl) : "";
+            const importUrl = item.scheme
+                ? item.schemeWrap
+                    ? item.scheme + encodeURIComponent(JSON.stringify({ [item.schemeWrap]: [downloadUrl] }))
+                    : item.scheme + encodeURIComponent(downloadUrl)
+                : "";
             const importBtn = importUrl 
                 ? '<a href="' + importUrl + '" class="btn btn-primary">一键导入</a>' 
                 : '<button class="btn btn-disabled" disabled>手动导入</button>';
