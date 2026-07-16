@@ -23,11 +23,26 @@ function getCSTDateString() {
 
 const app = new Hono();
 
+// 方法守卫：仅允许 GET 与 HEAD 请求，其余方法一律返回 405，避免代理接口被写入/删除类方法滥用。
 // 路径白名单守卫：仅放行首页、配置下载与 WeatherKit API 代理路径，其余一律返回 404。
-// 与下方 catch-all 路由 /:rest{.*} 配合：白名单内路径继续走后续路由，其余在进入路由前即被拦截。
+// 与下方仅注册 app.get 的 catch-all 路由 /:rest{.*} 配合：白名单内路径继续走后续路由，其余在进入路由前即被拦截。
 const ALLOWED_PATH_PREFIXES = ["/conf/", "/p/", "/api/v1/availability/", "/api/v1/airQualityScale/", "/api/v2/weather/"];
 
+// /p/:configBase64/:rest 路由放行的 WeatherKit 上游子路径前缀（rest 形态，无前导斜杠）。
+// 仅允许这些前缀，避免 /p/ 后乱输入被原样转发给 Apple，或被 routeRewrite 当作自定义上游 host（SSRF）。
+const ALLOWED_REST_PREFIXES = ["api/v1/availability/", "api/v1/airQualityScale/", "api/v2/weather/"];
+
+// 校验 rest 是否为合法的 WeatherKit 上游子路径，供 /p/ 与裸主机 catch-all 路由共用。
+// /p/<单段> 等不合法形态会从 /p/ 路由滑落到 catch-all，此处一并拦截，避免转发给 Apple。
+function isAllowedWeatherKitRest(rest = "") {
+    return ALLOWED_REST_PREFIXES.some(prefix => rest.startsWith(prefix));
+}
+
 app.use("*", async (c, next) => {
+    if (c.req.method !== "GET" && c.req.method !== "HEAD") {
+        c.header("Allow", "GET, HEAD");
+        return c.text("Method Not Allowed", 405);
+    }
     const { pathname } = new URL(c.req.url);
     if (pathname === "/" || ALLOWED_PATH_PREFIXES.some(prefix => pathname.startsWith(prefix))) {
         return next();
@@ -215,7 +230,11 @@ function decodeBase64Config(str) {
 }
 
 // 带配置前缀的请求路由
-app.all("/p/:configBase64/:rest{.*}", async c => {
+app.get("/p/:configBase64/:rest{.*}", async c => {
+    // rest 必须是合法的 WeatherKit 上游子路径，否则不转发，避免乱输入打到 Apple 或被当作自定义上游 host
+    if (!isAllowedWeatherKitRest(c.req.param("rest") || "")) {
+        return c.text("Not Found", 404);
+    }
     const configBase64 = c.req.param("configBase64");
     let queryArguments = {};
     try {
@@ -230,7 +249,11 @@ app.all("/p/:configBase64/:rest{.*}", async c => {
 });
 
 // 不带配置前缀的默认请求路由
-app.all("/:rest{.*}", async c => {
+app.get("/:rest{.*}", async c => {
+    // rest 必须是合法的 WeatherKit 上游子路径；拦截 /p/<单段> 等滑落到此路由的不合法形态
+    if (!isAllowedWeatherKitRest(c.req.param("rest") || "")) {
+        return c.text("Not Found", 404);
+    }
     return handleWeatherRequest(c, {});
 });
 
