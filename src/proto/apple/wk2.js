@@ -229,6 +229,11 @@ export const ParameterType = {
     FIRST_AT: 0,
     SECOND_AT: 1,
     UNKNOWN2: 2,
+
+    // Reverse mapping (number → string)
+    0: "FIRST_AT",
+    1: "SECOND_AT",
+    2: "UNKNOWN2",
 };
 
 export const PrecipitationType = {
@@ -3346,7 +3351,7 @@ export class NextHourForecastData {
     }
     condition(index, optional) {
         const i = this.bb.__offset(this.bb_pos, 6);
-        return i ? (optional || new ForecastMinute()).__init(this.bb.__indirect(this.bb.__vector(this.bb_pos + i) + 4 * index), this.bb) : null;
+        return i ? (optional || new Condition()).__init(this.bb.__indirect(this.bb.__vector(this.bb_pos + i) + 4 * index), this.bb) : null;
     }
     conditionLength() {
         const t = this.bb.__offset(this.bb_pos, 6);

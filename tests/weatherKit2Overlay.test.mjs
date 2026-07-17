@@ -82,6 +82,72 @@ test("encodeRootOverlay replaces, removes, and preserves root products", () => {
     assert.ok(all.news); // 槽 5 保留（非可注入，作为不透明表保留）
 });
 
+test("decode reads a non-empty forecastNextHour condition vector as Condition tables", () => {
+    // 回归：wk2.js 的 NextHourForecastData.condition(index) 曾误返回 new ForecastMinute()，
+    // 导致解码任何非空 condition 向量时抛出 condData.beginCondition is not a function。
+    // 此处往返注入带两个 condition（含参数向量）的 forecastNextHour，验证解码器返回 Condition。
+    const sourceBytes = createWeatherRoot([0, 1, 4, 5]);
+    const sourceBB = new ByteBuffer(sourceBytes);
+    const body = WeatherKit2.decode(sourceBB, ["forecastNextHour"]);
+
+    body.forecastNextHour = {
+        metadata: {
+            attributionUrl: "https://example.com",
+            expireTime: 1,
+            language: "zh",
+            latitude: 1,
+            longitude: 1,
+            providerLogo: "logo",
+            providerName: "RAIN_PROVIDER",
+            readTime: 1,
+            reportedTime: 1,
+            temporarilyUnavailable: false,
+            sourceType: "MODELED",
+        },
+        condition: [
+            {
+                forecastToken: "START",
+                parameters: [{ type: "FIRST_AT", date: 100 }],
+                startTime: 0,
+                endTime: 60,
+                beginCondition: "DRIZZLE",
+                endCondition: "DRIZZLE",
+            },
+            {
+                forecastToken: "CONSTANT",
+                parameters: [],
+                startTime: 60,
+                endTime: 0,
+                beginCondition: "HEAVY_RAIN",
+                endCondition: "HEAVY_RAIN",
+            },
+        ],
+        summary: [],
+        minutes: [],
+        forecastStart: 0,
+        forecastEnd: 120,
+    };
+    const replacementDataSets = new Set(["forecastNextHour"]);
+
+    const builder = new Builder(256);
+    const rootOffset = WeatherKit2.encodeRootOverlay(builder, sourceBB, replacementDataSets, body);
+    builder.finish(rootOffset);
+    const out = builder.asUint8Array();
+
+    const all = WeatherKit2.decode(new ByteBuffer(out), "all");
+    const conditions = all.forecastNextHour?.condition ?? [];
+    assert.equal(conditions.length, 2); // 非空 condition 向量解码成功（不再抛异常）
+    assert.equal(conditions[0].forecastToken, "START");
+    assert.equal(conditions[0].beginCondition, "DRIZZLE");
+    assert.equal(conditions[0].endCondition, "DRIZZLE");
+    assert.equal(conditions[0].startTime, 0);
+    assert.equal(conditions[0].endTime, 60);
+    assert.deepEqual(conditions[0].parameters, [{ type: "FIRST_AT", date: 100 }]); // 参数向量一并往返
+    assert.equal(conditions[1].forecastToken, "CONSTANT");
+    assert.equal(conditions[1].beginCondition, "HEAVY_RAIN");
+    assert.equal(conditions[1].parameters.length, 0);
+});
+
 function createWeatherRoot(presentSlots) {
     const builder = new Builder(256);
     const tables = new Map(presentSlots.map(slot => [slot, createEmptyTable(builder)]));
