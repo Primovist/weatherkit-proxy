@@ -96,41 +96,6 @@ export const ComparisonType = {
     UNKNOWN0: 0,
     TEMPERATURE_MAX: 1,
     PRECIPITATION: 2,
-    UNKNOWN3: 3,
-
-    // Reverse mapping (number → string)
-    0: "UNKNOWN0",
-    1: "TEMPERATURE_MAX",
-    2: "PRECIPITATION",
-    3: "UNKNOWN3",
-};
-
-export const Deviation = {
-    UNKNOWN: 0,
-    OBSERVED: 1,
-    LIKELY: 2,
-    POSSIBLE: 3,
-    UNLIKELY: 4,
-    UNKNOWN5: 5,
-};
-
-export const Direction = {
-    STEADY: 0,
-    INC: 1,
-    DEC: 2,
-    UNKNOWN3: 3,
-
-    // Reverse mapping (number → string)
-    0: "STEADY",
-    1: "INC",
-    2: "DEC",
-    3: "UNKNOWN3",
-};
-
-export const ComparisonType2 = {
-    UNKNOWN0: 0,
-    TEMPERATURE_MAX: 1,
-    PRECIPITATION: 2,
     TEMPERATURE_MIN: 3,
     SNOWFALL: 4,
     UNKNOWN5: 5,
@@ -144,7 +109,7 @@ export const ComparisonType2 = {
     5: "UNKNOWN5",
 };
 
-export const Deviation2 = {
+export const Deviation = {
     MUCHHIGHER: 0,
     HIGHER: 1,
     NORMAL: 2,
@@ -159,6 +124,19 @@ export const Deviation2 = {
     3: "LOWER",
     4: "MUCHLOWER",
     5: "UNKNOWN5",
+};
+
+export const Direction = {
+    STEADY: 0,
+    INC: 1,
+    DEC: 2,
+    UNKNOWN3: 3,
+
+    // Reverse mapping (number → string)
+    0: "STEADY",
+    1: "INC",
+    2: "DEC",
+    3: "UNKNOWN3",
 };
 
 export const ConditionType = {
@@ -557,36 +535,20 @@ export const Certainty = {
 };
 
 export const ImportanceType = {
-    UNKNOWN: 0,
-    UNKNOWN1: 1,
-    UNKNOWN2: 2,
-    UNKNOWN3: 3,
-    UNKNOWN4: 4,
+    MUCHHIGHER: 0,
+    HIGHER: 1,
+    NORMAL: 2,
+    LOWER: 3,
+    MUCHLOWER: 4,
     UNKNOWN5: 5,
-    UNKNOWN6: 6,
-    UNKNOWN7: 7,
-    UNKNOWN8: 8,
-    UNKNOWN9: 9,
-    STATEMENT: 10,
-    WARNING: 11,
-    ADVISORY: 12,
-    UNKNOWN13: 13,
 
     // Reverse mapping (number → string)
-    0: "UNKNOWN",
-    1: "UNKNOWN1",
-    2: "UNKNOWN2",
-    3: "UNKNOWN3",
-    4: "UNKNOWN4",
+    0: "MUCHHIGHER",
+    1: "HIGHER",
+    2: "NORMAL",
+    3: "LOWER",
+    4: "MUCHLOWER",
     5: "UNKNOWN5",
-    6: "UNKNOWN6",
-    7: "UNKNOWN7",
-    8: "UNKNOWN8",
-    9: "UNKNOWN9",
-    10: "STATEMENT",
-    11: "WARNING",
-    12: "ADVISORY",
-    13: "UNKNOWN13",
 };
 
 // ============================================================
@@ -1436,7 +1398,7 @@ export class Comparison {
     }
     condition() {
         const t = this.bb.__offset(this.bb_pos, 4);
-        return t ? this.bb.readInt8(this.bb_pos + t) : ComparisonType2.UNKNOWN0;
+        return t ? this.bb.readInt8(this.bb_pos + t) : ComparisonType.UNKNOWN0;
     }
     currentValue() {
         const t = this.bb.__offset(this.bb_pos, 6);
@@ -1448,7 +1410,7 @@ export class Comparison {
     }
     deviation() {
         const t = this.bb.__offset(this.bb_pos, 10);
-        return t ? this.bb.readInt8(this.bb_pos + t) : Deviation2.MUCHHIGHER;
+        return t ? this.bb.readInt8(this.bb_pos + t) : Deviation.MUCHHIGHER;
     }
     baselineType() {
         const t = this.bb.__offset(this.bb_pos, 12);
@@ -1462,7 +1424,7 @@ export class Comparison {
         builder.startObject(6);
     }
     static addCondition(builder, value) {
-        builder.addFieldInt8(0, value, ComparisonType2.UNKNOWN0);
+        builder.addFieldInt8(0, value, ComparisonType.UNKNOWN0);
     }
     static addCurrentValue(builder, value) {
         builder.addFieldFloat32(1, value, 0);
@@ -1471,7 +1433,7 @@ export class Comparison {
         builder.addFieldFloat32(2, value, 0);
     }
     static addDeviation(builder, value) {
-        builder.addFieldInt8(3, value, Deviation2.MUCHHIGHER);
+        builder.addFieldInt8(3, value, Deviation.MUCHHIGHER);
     }
     static addBaselineType(builder, value) {
         builder.addFieldInt32(4, value, 0);
@@ -3925,8 +3887,6 @@ export default {
     ComparisonType,
     Deviation,
     Direction,
-    ComparisonType2,
-    Deviation2,
     ConditionType,
     ForecastToken,
     ParameterType,
