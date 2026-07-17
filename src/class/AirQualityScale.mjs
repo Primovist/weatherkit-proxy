@@ -33,9 +33,9 @@ const SCALE_DISPLAY_LABEL = {
 
 const HJ6332012 = {
     displayName: {
-        "zh-Hans-CN": "空气质量指数",
-        "zh-Hant-HK": "空氣質量指數",
-        "en-US": "Air Quality Index",
+        "zh-Hans-CN": "AQI (CN)",
+        "zh-Hant-HK": "AQI (CN)",
+        "en-US": "AQI (CN)",
     },
     shortDisplayName: {
         "zh-Hans-CN": "AQI",
@@ -43,15 +43,15 @@ const HJ6332012 = {
         "en-US": "AQI",
     },
     longDisplayName: {
-        "zh-Hans-CN": "中国 (HJ 633—2012)",
-        "zh-Hant-HK": "中國 (HJ 633—2012)",
-        "en-US": "China (HJ 633—2012)",
+        "zh-Hans-CN": "中国(AQI)",
+        "zh-Hant-HK": "中國(AQI)",
+        "en-US": "China(AQI)",
     },
     categories: [
         {
             range: [0, 50],
             glyph: "aqi.low",
-            colors: ["#00E400"],
+            colors: ["#04DE71"],
             categoryName: {
                 "zh-Hans-CN": "优",
                 "zh-Hant-HK": "優",
@@ -66,7 +66,7 @@ const HJ6332012 = {
         {
             range: [51, 100],
             glyph: "aqi.low",
-            colors: ["#FFFF00"],
+            colors: ["#FFE620"],
             categoryName: {
                 "zh-Hans-CN": "良",
                 "zh-Hant-HK": "良",
@@ -81,7 +81,7 @@ const HJ6332012 = {
         {
             range: [101, 150],
             glyph: "aqi.medium",
-            colors: ["#FF7E00"],
+            colors: ["#FF9500"],
             categoryName: {
                 "zh-Hans-CN": "轻度污染",
                 "zh-Hant-HK": "輕度污染",
@@ -95,8 +95,8 @@ const HJ6332012 = {
         },
         {
             range: [151, 200],
-            glyph: "aqi.high",
-            colors: ["#FF0000"],
+            glyph: "aqi.medium",
+            colors: ["#FA114F"],
             categoryName: {
                 "zh-Hans-CN": "中度污染",
                 "zh-Hant-HK": "中度污染",
@@ -112,7 +112,7 @@ const HJ6332012 = {
         {
             range: [201, 300],
             glyph: "aqi.high",
-            colors: ["#99004C"],
+            colors: ["#AA00FF"],
             categoryName: {
                 "zh-Hans-CN": "重度污染",
                 "zh-Hant-HK": "重度污染",
@@ -127,7 +127,7 @@ const HJ6332012 = {
         {
             range: [301, 500],
             glyph: "aqi.high",
-            colors: ["#7E0023"],
+            colors: ["#80172B"],
             categoryName: {
                 "zh-Hans-CN": "严重污染",
                 "zh-Hant-HK": "嚴重污染",
@@ -142,17 +142,14 @@ const HJ6332012 = {
     ],
     gradient: {
         stops: [
-            { location: 0, color: "#00E400" },
-            { location: 50, color: "#00E400" },
-            { location: 51, color: "#FFFF00" },
-            { location: 100, color: "#FFFF00" },
-            { location: 101, color: "#FF7E00" },
-            { location: 150, color: "#FF7E00" },
-            { location: 151, color: "#FF0000" },
-            { location: 200, color: "#FF0000" },
-            { location: 201, color: "#99004C" },
-            { location: 300, color: "#99004C" },
-            { location: 301, color: "#7E0023" },
+            { location: 0, color: "#04DE71" },
+            { location: 25, color: "#04DE71" },
+            { location: 75, color: "#FFE620" },
+            { location: 125, color: "#FF9500" },
+            { location: 175, color: "#FA114F" },
+            { location: 250, color: "#AA00FF" },
+            { location: 350, color: "#80172B" },
+            { location: 500, color: "#80172B" },
         ],
     },
 };
@@ -161,9 +158,9 @@ const HJ6332012 = {
 
 const EPA_NOWCAST = {
     displayName: {
-        "zh-Hans-CN": "空气质量指数",
-        "zh-Hant-HK": "空氣質量指數",
-        "en-US": "Air Quality Index",
+        "zh-Hans-CN": "AQI (US)",
+        "zh-Hant-HK": "AQI (US)",
+        "en-US": "AQI (US)",
     },
     shortDisplayName: {
         "zh-Hans-CN": "AQI",
@@ -171,15 +168,15 @@ const EPA_NOWCAST = {
         "en-US": "AQI",
     },
     longDisplayName: {
-        "zh-Hans-CN": "美国 (EPA NowCast)",
-        "zh-Hant-HK": "美國 (EPA NowCast)",
-        "en-US": "United States (EPA NowCast)",
+        "zh-Hans-CN": "美国(AQI)",
+        "zh-Hant-HK": "美國(AQI)",
+        "en-US": "United States(AQI)",
     },
     categories: [
         {
             range: [0, 50],
             glyph: "aqi.low",
-            colors: ["#00E400"],
+            colors: ["#04DE71"],
             categoryName: {
                 "zh-Hans-CN": "优",
                 "zh-Hant-HK": "優",
@@ -193,8 +190,8 @@ const EPA_NOWCAST = {
         },
         {
             range: [51, 100],
-            glyph: "aqi.low",
-            colors: ["#FFFF00"],
+            glyph: "aqi.medium",
+            colors: ["#FFE620"],
             categoryName: {
                 "zh-Hans-CN": "良",
                 "zh-Hant-HK": "良",
@@ -208,8 +205,8 @@ const EPA_NOWCAST = {
         },
         {
             range: [101, 150],
-            glyph: "aqi.medium",
-            colors: ["#FF7E00"],
+            glyph: "aqi.high",
+            colors: ["#FF9500"],
             categoryName: {
                 "zh-Hans-CN": "敏感人群不健康",
                 "zh-Hant-HK": "敏感人群不健康",
@@ -224,7 +221,7 @@ const EPA_NOWCAST = {
         {
             range: [151, 200],
             glyph: "aqi.high",
-            colors: ["#FF0000"],
+            colors: ["#FA114F"],
             categoryName: {
                 "zh-Hans-CN": "不健康",
                 "zh-Hant-HK": "不健康",
@@ -239,7 +236,7 @@ const EPA_NOWCAST = {
         {
             range: [201, 300],
             glyph: "aqi.high",
-            colors: ["#99004C"],
+            colors: ["#AA00FF"],
             categoryName: {
                 "zh-Hans-CN": "非常不健康",
                 "zh-Hant-HK": "非常不健康",
@@ -254,7 +251,7 @@ const EPA_NOWCAST = {
         {
             range: [301, 500],
             glyph: "aqi.high",
-            colors: ["#7E0023"],
+            colors: ["#80172B"],
             categoryName: {
                 "zh-Hans-CN": "危险",
                 "zh-Hant-HK": "危險",
@@ -269,17 +266,14 @@ const EPA_NOWCAST = {
     ],
     gradient: {
         stops: [
-            { location: 0, color: "#00E400" },
-            { location: 50, color: "#00E400" },
-            { location: 51, color: "#FFFF00" },
-            { location: 100, color: "#FFFF00" },
-            { location: 101, color: "#FF7E00" },
-            { location: 150, color: "#FF7E00" },
-            { location: 151, color: "#FF0000" },
-            { location: 200, color: "#FF0000" },
-            { location: 201, color: "#99004C" },
-            { location: 300, color: "#99004C" },
-            { location: 301, color: "#7E0023" },
+            { location: 0, color: "#04DE71" },
+            { location: 25, color: "#04DE71" },
+            { location: 75, color: "#FFE620" },
+            { location: 125, color: "#FF9500" },
+            { location: 175, color: "#FA114F" },
+            { location: 250, color: "#AA00FF" },
+            { location: 350, color: "#80172B" },
+            { location: 500, color: "#80172B" },
         ],
     },
 };
@@ -288,9 +282,9 @@ const EPA_NOWCAST = {
 
 const EU_EAQI = {
     displayName: {
-        "zh-Hans-CN": "欧洲空气质量指数",
-        "zh-Hant-HK": "歐洲空氣質量指數",
-        "en-US": "European Air Quality Index",
+        "zh-Hans-CN": "EAQI (EU)",
+        "zh-Hant-HK": "EAQI (EU)",
+        "en-US": "EAQI (EU)",
     },
     shortDisplayName: {
         "zh-Hans-CN": "EAQI",
@@ -298,15 +292,15 @@ const EU_EAQI = {
         "en-US": "EAQI",
     },
     longDisplayName: {
-        "zh-Hans-CN": "欧洲 (EAQI)",
-        "zh-Hant-HK": "歐洲 (EAQI)",
-        "en-US": "Europe (EAQI)",
+        "zh-Hans-CN": "欧洲(EAQI)",
+        "zh-Hant-HK": "歐洲(EAQI)",
+        "en-US": "Europe(EAQI)",
     },
     categories: [
         {
             range: [0, 20],
             glyph: "aqi.low",
-            colors: ["#1E88E5"],
+            colors: ["#2094FA"],
             categoryName: {
                 "zh-Hans-CN": "非常好",
                 "zh-Hant-HK": "非常好",
@@ -321,7 +315,7 @@ const EU_EAQI = {
         {
             range: [21, 40],
             glyph: "aqi.low",
-            colors: ["#00C853"],
+            colors: ["#04DE71"],
             categoryName: {
                 "zh-Hans-CN": "好",
                 "zh-Hant-HK": "好",
@@ -336,7 +330,7 @@ const EU_EAQI = {
         {
             range: [41, 60],
             glyph: "aqi.medium",
-            colors: ["#FFEB3B"],
+            colors: ["#FFE620"],
             categoryName: {
                 "zh-Hans-CN": "中等",
                 "zh-Hant-HK": "中等",
@@ -351,7 +345,7 @@ const EU_EAQI = {
         {
             range: [61, 80],
             glyph: "aqi.high",
-            colors: ["#FF9800"],
+            colors: ["#FF9500"],
             categoryName: {
                 "zh-Hans-CN": "差",
                 "zh-Hant-HK": "差",
@@ -366,7 +360,7 @@ const EU_EAQI = {
         {
             range: [81, 100],
             glyph: "aqi.high",
-            colors: ["#F44336"],
+            colors: ["#FA114F"],
             categoryName: {
                 "zh-Hans-CN": "非常差",
                 "zh-Hant-HK": "非常差",
@@ -381,15 +375,13 @@ const EU_EAQI = {
     ],
     gradient: {
         stops: [
-            { location: 0, color: "#1E88E5" },
-            { location: 20, color: "#1E88E5" },
-            { location: 21, color: "#00C853" },
-            { location: 40, color: "#00C853" },
-            { location: 41, color: "#FFEB3B" },
-            { location: 60, color: "#FFEB3B" },
-            { location: 61, color: "#FF9800" },
-            { location: 80, color: "#FF9800" },
-            { location: 81, color: "#F44336" },
+            { location: 0, color: "#2094FA" },
+            { location: 10, color: "#2094FA" },
+            { location: 30, color: "#04DE71" },
+            { location: 50, color: "#FFE620" },
+            { location: 70, color: "#FF9500" },
+            { location: 90, color: "#FA114F" },
+            { location: 100, color: "#FA114F" },
         ],
     },
 };
@@ -398,9 +390,9 @@ const EU_EAQI = {
 
 const UBA = {
     displayName: {
-        "zh-Hans-CN": "德国空气质量指数",
-        "zh-Hant-HK": "德國空氣質量指數",
-        "en-US": "German Air Quality Index",
+        "zh-Hans-CN": "LQI (DE)",
+        "zh-Hant-HK": "LQI (DE)",
+        "en-US": "LQI (DE)",
     },
     shortDisplayName: {
         "zh-Hans-CN": "LQI",
@@ -408,15 +400,15 @@ const UBA = {
         "en-US": "LQI",
     },
     longDisplayName: {
-        "zh-Hans-CN": "德国 (UBA LQI)",
-        "zh-Hant-HK": "德國 (UBA LQI)",
-        "en-US": "Germany (UBA LQI)",
+        "zh-Hans-CN": "德国(LQI)",
+        "zh-Hant-HK": "德國(LQI)",
+        "en-US": "Germany(LQI)",
     },
     categories: [
         {
             range: [0, 0.99],
             glyph: "aqi.low",
-            colors: ["#00C853"],
+            colors: ["#04DE71"],
             categoryName: {
                 "zh-Hans-CN": "非常好",
                 "zh-Hant-HK": "非常好",
@@ -431,7 +423,7 @@ const UBA = {
         {
             range: [1, 1.99],
             glyph: "aqi.low",
-            colors: ["#64DD17"],
+            colors: ["#58E156"],
             categoryName: {
                 "zh-Hans-CN": "好",
                 "zh-Hant-HK": "好",
@@ -446,7 +438,7 @@ const UBA = {
         {
             range: [2, 2.99],
             glyph: "aqi.medium",
-            colors: ["#FFEB3B"],
+            colors: ["#FFE620"],
             categoryName: {
                 "zh-Hans-CN": "中等",
                 "zh-Hant-HK": "中等",
@@ -461,7 +453,7 @@ const UBA = {
         {
             range: [3, 3.99],
             glyph: "aqi.high",
-            colors: ["#FF9800"],
+            colors: ["#FF9500"],
             categoryName: {
                 "zh-Hans-CN": "差",
                 "zh-Hant-HK": "差",
@@ -477,7 +469,7 @@ const UBA = {
             // 末档容纳超标值（与计算分类 [4, Infinity] 对齐；#buildGenericScale 会把 Infinity 归一为 9999）。
             range: [4, Number.POSITIVE_INFINITY],
             glyph: "aqi.high",
-            colors: ["#F44336"],
+            colors: ["#FA114F"],
             categoryName: {
                 "zh-Hans-CN": "非常差",
                 "zh-Hant-HK": "非常差",
@@ -492,11 +484,11 @@ const UBA = {
     ],
     gradient: {
         stops: [
-            { location: 0, color: "#00C853" },
-            { location: 1, color: "#64DD17" },
-            { location: 2, color: "#FFEB3B" },
-            { location: 3, color: "#FF9800" },
-            { location: 4, color: "#F44336" },
+            { location: 0, color: "#04DE71" },
+            { location: 1, color: "#58E156" },
+            { location: 2, color: "#FFE620" },
+            { location: 3, color: "#FF9500" },
+            { location: 4, color: "#FA114F" },
         ],
     },
 };
