@@ -5,6 +5,7 @@ import QWeather from "./class/QWeather.mjs";
 import buildSettings from "./function/buildSettings.mjs";
 import configs from "./function/configs/index.mjs";
 import database from "./function/database.mjs";
+import filterWeatherKitDataSets from "./function/filterWeatherKitDataSets.mjs";
 import { renderIndex } from "./function/indexPage.mjs";
 import parseWeatherKitURL from "./function/parseWeatherKitURL.mjs";
 import { Response } from "./process/Response.mjs";
@@ -138,6 +139,14 @@ async function handleWeatherRequest(c, queryArguments = {}) {
         // 提前解析 URL 参数，用于并发预取第三方数据
         const { Settings, Configs } = buildSettings(database, finalArguments);
         store.Settings = Settings;
+
+        // 配置仅能关闭代理会注入的产品；Apple 新增或代理不认识的数据集继续原样请求。
+        const requestedDataSets = url.searchParams.get("dataSets")?.split(",");
+        if (requestedDataSets) {
+            const filteredDataSets = filterWeatherKitDataSets(requestedDataSets, Settings?.DataSets, database.WeatherKit.Settings.DataSets);
+            url.searchParams.set("dataSets", filteredDataSets.join(","));
+            $request.url = url.toString();
+        }
         const parameters = parseWeatherKitURL(url);
         const enviroments = {
             colorfulClouds: new ColorfulClouds(parameters, Settings?.API?.ColorfulClouds?.Token || "Y2FpeXVuX25vdGlmeQ=="),

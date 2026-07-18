@@ -1,0 +1,26 @@
+{
+    "$schema": "./node_modules/wrangler/config-schema.json",
+    "name": "weatherkit",
+    "main": "src/Hono.js",
+    "compatibility_date": "2026-07-18",
+    "compatibility_flags": ["nodejs_compat"],
+    "minify": true,
+    "observability": {
+        "enabled": true,
+        "head_sampling_rate": 1,
+        "logs": {
+            "enabled": true,
+            "head_sampling_rate": 1,
+            "persist": true,
+            "invocation_logs": true
+        },
+        "traces": {
+            "enabled": true,
+            "persist": true,
+            "head_sampling_rate": 1
+        }
+    },
+    "placement": {
+        "mode": "smart"
+    }
+}

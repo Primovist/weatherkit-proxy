@@ -5,9 +5,10 @@ import ColorfulClouds from "../class/ColorfulClouds.mjs";
 import QWeather from "../class/QWeather.mjs";
 import Weather from "../class/Weather.mjs";
 import WeatherKit2 from "../class/WeatherKit2.mjs";
-import database from "../function/database.mjs";
-import parseWeatherKitURL from "../function/parseWeatherKitURL.mjs";
 import buildSettings from "../function/buildSettings.mjs";
+import database from "../function/database.mjs";
+import mergeWeatherKitAvailability from "../function/mergeWeatherKitAvailability.mjs";
+import parseWeatherKitURL from "../function/parseWeatherKitURL.mjs";
 import { Console, fetch } from "../utils/index.mjs";
 /***************** Processing *****************/
 export async function Response($request, $response, context = {}) {
@@ -52,12 +53,12 @@ export async function Response($request, $response, context = {}) {
         const language = pathParts[3] ?? "en";
         const scaleName = pathParts[4] ?? "";
 
-        // Apple 返回 404 且当前版本号非 2604：用 2604 重试一次，探测 Apple 是否已升级该标尺版本。
-        // 标尺名不含 "."（无版本号）或已是 2604 时跳过，避免无意义的重复请求。
+        // Apple 返回 404 且当前数字版本号非 2604：用 2604 重试一次。
+        // EU.EAQI 这类无版本 alias 本身含点号，不能把 EAQI 误当成版本号替换。
         const APPLE_SCALE_FALLBACK_VERSION = "2604";
-        const dot = scaleName.lastIndexOf(".");
-        if ($response.status === 404 && dot > 0 && !scaleName.endsWith(`.${APPLE_SCALE_FALLBACK_VERSION}`)) {
-            const retryScaleName = `${scaleName.slice(0, dot)}.${APPLE_SCALE_FALLBACK_VERSION}`;
+        const versionedScale = scaleName.match(/^(.*)\.(\d+)$/);
+        if ($response.status === 404 && versionedScale && versionedScale[2] !== APPLE_SCALE_FALLBACK_VERSION) {
+            const retryScaleName = `${versionedScale[1]}.${APPLE_SCALE_FALLBACK_VERSION}`;
             const retryUrl = new URL($request.url);
             const segments = retryUrl.pathname.split("/");
             segments[segments.length - 1] = retryScaleName;
@@ -116,7 +117,7 @@ export async function Response($request, $response, context = {}) {
                 case "weatherkit.apple.com":
                     // 路径判断
                     if (url.pathname.startsWith("/api/v1/availability/")) {
-                        body = Configs?.Availability?.v2;
+                        body = mergeWeatherKitAvailability(body, Configs?.Availability?.v2);
                     }
                     break;
             }
@@ -437,8 +438,9 @@ async function InjectForecastNextHour(forecastNextHour, Settings, enviroments, p
  * @returns {Promise<any>} 合并后的空气质量对象
  */
 async function InjectAirQuality(airQuality, Settings, enviroments, preFetched = {}) {
-    // Step1. 修复污染物单位
+    // Step1. 修复污染物单位，并将 Apple 内置 AQ scale 归一为稳定的无版本标识
     airQuality = AirQuality.FixPollutantsUnits(airQuality);
+    airQuality = AirQuality.NormalizeScaleIdentifier(airQuality);
 
     // Step2. 判断原始污染物是否为空，并在需要时注入污染物数据
     const isPollutantEmpty = !Array.isArray(airQuality?.pollutants) || airQuality.pollutants.length === 0;
@@ -655,8 +657,7 @@ async function InjectComparison(airQuality, currentIndexProvider, Settings, envi
     };
     const qweatherComparison = async (currentCategoryIndex, pollutantsToAirQuality) => {
         Console.debug("☑️ qweatherComparison", `currentCategoryIndex: ${currentCategoryIndex}`);
-        const locationsGrid = preFetched?.locationsGrid
-            ?? await QWeather.GetLocationsGrid(undefined, () => {});
+        const locationsGrid = preFetched?.locationsGrid ?? (await QWeather.GetLocationsGrid(undefined, () => {}));
         const { latitude, longitude } = enviroments.qWeather;
         const locationInfo = QWeather.GetLocationInfo(locationsGrid, latitude, longitude);
 

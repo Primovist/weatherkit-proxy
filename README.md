@@ -1,6 +1,6 @@
 # <img src="https://developer.apple.com/assets/elements/icons/weatherkit/weatherkit-128x128.png" width="32" height="32" align="center"> WeatherKit-Proxy
 
-这是一个对 [NSRingo/WeatherKit](https://github.com/NSRingo/WeatherKit) 进行重构与改造的项目，使其支持自主独立部署在 **Cloudflare Workers** 与 **Vercel**。移除了所有本地繁琐的脚本代理依赖，提供一键独立部署与代理配置的动态下载。
+这是一个对 [NSRingo/WeatherKit](https://github.com/NSRingo/WeatherKit) 进行重构与改造的项目，使其支持自主独立部署在 **Cloudflare Workers**、**Cloudflare Pages** 与 **Vercel**。移除了所有本地繁琐的脚本代理依赖，提供一键独立部署与代理配置的动态下载。
 
 
 ---
@@ -36,6 +36,18 @@ npx wrangler login
 # 部署服务
 npm run deploy:wrangler
 ```
+
+---
+
+### 部署到 Cloudflare Pages
+
+项目已提供 Pages Functions 入口 `functions/[[route]].js`。安装依赖并登录 Cloudflare 后运行：
+
+```bash
+npm run deploy:pages
+```
+
+本地调试 Pages Functions 可运行 `npm run dev:pages`。
 
 ---
 
@@ -94,4 +106,3 @@ npm run deploy:vercel
   - **内置算法与多国标准适配**：内置空气质量换算公式，支持中国国标 (HJ 633-2012 / 2025年草案)、美国 NowCast、欧盟 EAQI、德国 LQI 等；支持多达 18 种空气替换目标标准。
   - **性能与额外开关**：提供**边缘节点缓存 (EdgeCache)** 开关提升二次请求响应速度，并可自由开启逐日/逐小时预报数据源替换。
 - 💾 **一键分享与备份**：提供“备份/分享此配置页链接”按钮，点击后将当前全部配置状态编码打包进 URL 链接中。您可以通过该链接在其他设备上直接还原并同步您的所有设置。
-

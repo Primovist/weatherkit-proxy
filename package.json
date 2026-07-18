@@ -28,10 +28,14 @@
     },
     "scripts": {
         "dev": "npm run dev:wrangler",
+        "dev:pages": "node ./node_modules/wrangler/bin/wrangler.js pages dev pages --port 8787",
+        "dev:workers": "npm run dev:wrangler",
         "dev:vercel": "npx -y vercel dev",
-        "dev:wrangler": "node ./node_modules/wrangler/bin/wrangler.js dev",
+        "dev:wrangler": "node ./node_modules/wrangler/bin/wrangler.js dev -c wrangler.workers.jsonc",
+        "deploy:pages": "node ./node_modules/wrangler/bin/wrangler.js pages deploy pages",
+        "deploy:workers": "npm run deploy:wrangler",
         "deploy:vercel": "npx vercel deploy --prod",
-        "deploy:wrangler": "node ./node_modules/wrangler/bin/wrangler.js deploy --minify",
+        "deploy:wrangler": "node ./node_modules/wrangler/bin/wrangler.js deploy --minify -c wrangler.workers.jsonc",
         "build": "echo 'No build step required'",
         "test": "node --test",
         "submodule": "git submodule update --remote",
@@ -43,7 +47,7 @@
     "devDependencies": {
         "@biomejs/biome": "2.1.4",
         "typescript": "^5.9.3",
-        "wrangler": "^3.109.0"
+        "wrangler": "^4.112.0"
     },
     "dependencies": {
         "fetch-cookie": "^3.2.0",

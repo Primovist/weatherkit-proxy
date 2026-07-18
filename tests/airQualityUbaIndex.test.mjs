@@ -48,7 +48,7 @@ test("UBA 整数 index 必须等于 categoryIndex（与上游一致），PM2.5=3
     assert.equal(res.index, res.categoryIndex, `index 必须等于 categoryIndex（=${res.categoryIndex}），否则 iOS 隐藏 UBA 卡片；实际 index=${res.index}`);
     assert.equal(res.index, 4, "应与上游一致：index = categoryIndex = 4，而非 floor(3.208)=3");
     assert.equal(res.primaryPollutant, "PM2_5");
-    assert.equal(res.scale, "UBA.2414");
+    assert.equal(res.scale, "UBA");
 });
 
 test("UBA 跨多档浓度 index 与 categoryIndex 恒等（核心不变式）", () => {

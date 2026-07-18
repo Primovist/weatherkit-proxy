@@ -204,7 +204,7 @@ export default class QWeather {
                             sourceType: "STATION",
                         },
                         cloudCover: Number.parseInt(body?.now?.cloud, 10),
-                        conditionCode: Weather.ConvertWeatherCode(body?.now?.text),
+                        ...Weather.ConvertWeatherCodeField(body?.now?.text),
                         humidity: Number.parseInt(body?.now?.humidity, 10),
                         perceivedPrecipitationIntensity: Number.parseFloat(body?.now?.precip),
                         pressure: Number.parseFloat(body?.now?.pressure),
@@ -368,7 +368,7 @@ export default class QWeather {
 
                             providerName: "和风天气",
                             readTime: timeStamp,
-                            reportedTime: new Date(body?.updateTime),
+                            reportedTime: Math.trunc(new Date(body?.updateTime).getTime() / 1000),
                             temporarilyUnavailable: false,
                             sourceType: "STATION",
                         },
@@ -378,7 +378,7 @@ export default class QWeather {
                                 // cloudCoverHighAltPct: 0, // Not given
                                 // cloudCoverLowAltPct: 0, // Not given
                                 // cloudCoverMidAltPct: 0, // Not given
-                                conditionCode: Weather.ConvertWeatherCode(hourly?.text),
+                                ...Weather.ConvertWeatherCodeField(hourly?.text),
                                 // daylight: false, // Not given
                                 forecastStart: (new Date(hourly?.fxTime).getTime() / 1000) | 0,
                                 humidity: Number.parseInt(hourly?.humidity, 10),
@@ -436,6 +436,7 @@ export default class QWeather {
             switch (body?.code) {
                 case "200": {
                     const timeStamp = (Date.now() / 1000) | 0;
+                    const reportedTime = new Date(body?.updateTime);
                     const metadata = {
                         attributionUrl: body?.fxLink,
                         expireTime: timeStamp + 60 * 60,
@@ -445,11 +446,11 @@ export default class QWeather {
 
                         providerName: "和风天气",
                         readTime: timeStamp,
-                        reportedTime: new Date(body?.updateTime),
+                        reportedTime: Math.trunc(reportedTime.getTime() / 1000),
                         temporarilyUnavailable: false,
                         sourceType: "STATION",
                     };
-                    const timezoneOffset = metadata.reportedTime.getTimezoneOffset();
+                    const timezoneOffset = reportedTime.getTimezoneOffset();
                     forecastDaily = {
                         metadata: metadata,
                         days: body?.daily?.map(daily => {
@@ -497,7 +498,7 @@ export default class QWeather {
                                     // cloudCoverHighAltPct: 0, // Not given
                                     // cloudCoverLowAltPct: 0, // Not given
                                     // cloudCoverMidAltPct: 0, // Not given
-                                    conditionCode: Weather.ConvertWeatherCode(daily?.textDay),
+                                    ...Weather.ConvertWeatherCodeField(daily?.textDay),
                                     // humidity 用一整天的数据代替
                                     // humidityMax: daily?.humidity, // Not Accurate
                                     // humidityMin: daily?.humidity, // Not Accurate
@@ -523,7 +524,7 @@ export default class QWeather {
                                     // cloudCoverHighAltPct: 0, // Not given
                                     // cloudCoverLowAltPct: 0, // Not given
                                     // cloudCoverMidAltPct: 0, // Not given
-                                    conditionCode: Weather.ConvertWeatherCode(daily?.textNight),
+                                    ...Weather.ConvertWeatherCodeField(daily?.textNight),
                                     // humidity 用一整天的数据代替
                                     // humidityMax: daily?.humidity, // Not Accurate
                                     // humidityMin: daily?.humidity, // Not Accurate
@@ -796,7 +797,9 @@ export default class QWeather {
             };
         }
 
-        const categoryIndex = Number.parseInt(supportedIndex.level, 10);
+        const index = Number(supportedIndex.aqi);
+        const suppliedCategoryIndex = Number.parseInt(supportedIndex.level, 10);
+        const categoryIndex = Number.isFinite(suppliedCategoryIndex) && suppliedCategoryIndex > 0 ? suppliedCategoryIndex : AirQuality.CategoryIndex(index, scale.categories);
         const apiPrimaryPollutant = this.#Config.Pollutants[supportedIndex.primaryPollutant?.code] || "NOT_AVAILABLE";
         Console.debug(`apiPrimaryPollutant: ${apiPrimaryPollutant}`);
 
@@ -810,7 +813,7 @@ export default class QWeather {
                 `https://www.qweather.com/air/a/${this.latitude},${this.longitude}?from=AppleWeatherService`,
             ),
             categoryIndex,
-            index: supportedIndex.aqi,
+            index,
             isSignificant: categoryIndex >= scale.categories.significantIndex,
             ...particularAirQuality,
             primaryPollutant: apiPrimaryPollutant,
