@@ -128,6 +128,30 @@ test("Response keeps forecastNextHour when prefetch has visible (light+) precipi
     assert.equal(all.forecastNextHour.metadata.providerName, "RAIN_PROVIDER");
 });
 
+test("Response repairs a displayed-zero daily total from same-day hourly precipitation", async () => {
+    const forecastStart = 1_784_092_800;
+    const originalBytes = createDailyAndHourlyWeather(forecastStart);
+    const Settings = { Weather: { Replace: ["CN"], ReplaceDaily: false, ReplaceHourly: false } };
+
+    const res = await Response({ url: "https://weatherkit.apple.com/api/v2/weather/zh-Hans-CN/22.5/114.0?country=CN&dataSets=forecastDaily,forecastHourly" }, { bodyBytes: originalBytes, headers: { "Content-Type": "application/vnd.apple.flatbuffer" }, status: 200 }, { Settings });
+
+    const all = WeatherKit2.decode(new ByteBuffer(new Uint8Array(res.body)), "all");
+    const day = all.forecastDaily.days[0];
+    assert.equal(day.precipitationAmount, 0.75);
+    assert.equal(day.precipitationType, "RAIN");
+    assert.deepEqual(day.precipitationAmountByType, [
+        {
+            expected: 0.75,
+            expectedSnow: 0,
+            maximumSnow: 0,
+            minimumSnow: 0,
+            precipitationType: "RAIN",
+        },
+    ]);
+    assert.equal(all.forecastHourly.hours[0].precipitationAmount, 0.25);
+    assert.equal(all.forecastHourly.hours[1].precipitationAmount, 0.5);
+});
+
 function createWeatherRoot(presentSlots) {
     const builder = new Builder(256);
     const tables = new Map(presentSlots.map(slot => [slot, createEmptyTable(builder)]));
@@ -141,4 +165,31 @@ function createWeatherRoot(presentSlots) {
 function createEmptyTable(builder) {
     builder.startObject(0);
     return builder.endObject();
+}
+
+function createDailyAndHourlyWeather(forecastStart) {
+    const builder = new Builder(1024);
+    const root = WeatherKit2.encode(builder, "all", {
+        forecastDaily: {
+            days: [
+                {
+                    conditionCode: "RAIN",
+                    forecastEnd: forecastStart + 24 * 3600,
+                    forecastStart,
+                    precipitationAmount: 0.2,
+                    precipitationAmountByType: [],
+                    precipitationChance: 70,
+                    precipitationType: "RAIN",
+                },
+            ],
+        },
+        forecastHourly: {
+            hours: [
+                { conditionCode: "RAIN", forecastStart: forecastStart + 3 * 3600, precipitationAmount: 0.25, precipitationChance: 60, precipitationType: "RAIN" },
+                { conditionCode: "RAIN", forecastStart: forecastStart + 4 * 3600, precipitationAmount: 0.5, precipitationChance: 60, precipitationType: "RAIN" },
+            ],
+        },
+    });
+    builder.finish(root);
+    return builder.asUint8Array().slice();
 }

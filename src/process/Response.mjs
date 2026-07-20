@@ -203,6 +203,15 @@ export async function Response($request, $response, context = {}) {
                                     }),
                                 );
 
+                                // WeatherKit 在凌晨偶尔会返回“当日累计量为 0，但同日小时预报已有明显降水”。
+                                // 所有预报注入完成后再跨产品校验，这样无论小时数据来自 Apple 还是第三方，
+                                // 都能使用客户端实际会看到的最终数据修复每日累计量。
+                                const repairedDailyTotals = Weather.repairDailyPrecipitationTotals(body?.forecastDaily?.days, body?.forecastHourly?.hours);
+                                if (repairedDailyTotals > 0) {
+                                    replacementDataSets.add("forecastDaily");
+                                    Console.info("RepairDailyPrecipitationTotals", `已修复 ${repairedDailyTotals} 天的降水累计量`);
+                                }
+
                                 // 去掉所有 providerLogo（本仓库既定行为）；被剥离 logo 的可注入区段需要重编码以反映改动。
                                 const allSections = ["currentWeather", "forecastDaily", "forecastHourly", "forecastNextHour", "airQuality"];
                                 allSections.forEach(s => {

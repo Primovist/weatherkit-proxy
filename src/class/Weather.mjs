@@ -1,5 +1,54 @@
 import { Console } from "../utils/index.mjs";
 
+const PRECIPITATION_TYPES = new Set(["RAIN", "SNOW", "SLEET", "HAIL", "MIXED"]);
+const CONDITION_TO_PRECIPITATION_TYPE = new Map([
+    ["BLIZZARD", "SNOW"],
+    ["BLOWING_SNOW", "SNOW"],
+    ["DRIZZLE", "RAIN"],
+    ["FLURRIES", "SNOW"],
+    ["FREEZING_DRIZZLE", "SLEET"],
+    ["FREEZING_RAIN", "SLEET"],
+    ["HAIL", "HAIL"],
+    ["HEAVY_RAIN", "RAIN"],
+    ["HEAVY_SNOW", "SNOW"],
+    ["HURRICANE", "RAIN"],
+    ["ISOLATED_THUNDERSTORMS", "RAIN"],
+    ["RAIN", "RAIN"],
+    ["SCATTERED_THUNDERSTORMS", "RAIN"],
+    ["SLEET", "SLEET"],
+    ["SNOW", "SNOW"],
+    ["STRONG_STORMS", "RAIN"],
+    ["SUN_FLURRIES", "SNOW"],
+    ["SUN_SHOWERS", "RAIN"],
+    ["THUNDERSTORMS", "RAIN"],
+    ["TROPICAL_STORM", "RAIN"],
+    ["WINTRY_MIX", "MIXED"],
+]);
+
+function finiteNonNegative(value) {
+    const number = Number(value);
+    return Number.isFinite(number) && number > 0 ? number : 0;
+}
+
+function roundPrecipitation(value) {
+    return Math.round(value * 1_000_000) / 1_000_000;
+}
+
+function sumExpectedPrecipitation(items) {
+    if (!Array.isArray(items)) return 0;
+    return items.reduce((sum, item) => sum + finiteNonNegative(item?.expected), 0);
+}
+
+function precipitationTypeForHour(hour, day) {
+    if (PRECIPITATION_TYPES.has(hour?.precipitationType)) return hour.precipitationType;
+
+    const hourlyConditionType = CONDITION_TO_PRECIPITATION_TYPE.get(hour?.conditionCode);
+    if (hourlyConditionType) return hourlyConditionType;
+
+    if (PRECIPITATION_TYPES.has(day?.precipitationType)) return day.precipitationType;
+    return CONDITION_TO_PRECIPITATION_TYPE.get(day?.conditionCode) ?? "RAIN";
+}
+
 export default class Weather {
     static Name = "Weather";
     static Version = "0.3.0";
@@ -51,6 +100,71 @@ export default class Weather {
             }
         }
         return to; // 可选：返回同一个引用
+    }
+
+    /**
+     * 修复“小时预报有明显降水，但每日累计量显示为 0”的跨产品不一致。
+     *
+     * WeatherKit 的每日累计量和小时量是独立字段；在凌晨，每日字段偶尔仍为
+     * 0（或小于整毫米显示阈值），而同一自然日的小时预报已经有降水。只在每日
+     * 值会显示为 0、且小时汇总至少为 0.5 mm 时才回填，避免覆盖正常的每日预报。
+     * 同时重建 precipitationAmountByType，保持 scalar/by-type 字段成对一致。
+     *
+     * @param {array} days - 每日预报
+     * @param {array} hours - 小时预报
+     * @returns {number} 被修复的日记录数
+     */
+    static repairDailyPrecipitationTotals(days = [], hours = []) {
+        if (!Array.isArray(days) || !Array.isArray(hours) || !days.length || !hours.length) return 0;
+
+        const DISPLAY_ZERO_THRESHOLD_MM = 0.5;
+        let repaired = 0;
+
+        for (const day of days) {
+            const originalAmount = finiteNonNegative(day?.precipitationAmount);
+            if (!day || originalAmount >= DISPLAY_ZERO_THRESHOLD_MM) continue;
+
+            // 若 Apple 已给出可用的 by-type 明细，优先仅修复与其不一致的 scalar。
+            const existingByTypeTotal = sumExpectedPrecipitation(day.precipitationAmountByType);
+            if (existingByTypeTotal >= DISPLAY_ZERO_THRESHOLD_MM) {
+                day.precipitationAmount = roundPrecipitation(existingByTypeTotal);
+                repaired++;
+                continue;
+            }
+
+            const forecastStart = Number(day.forecastStart);
+            const forecastEnd = Number(day.forecastEnd);
+            if (!Number.isFinite(forecastStart) || !Number.isFinite(forecastEnd) || forecastEnd <= forecastStart) continue;
+
+            const amountByType = new Map();
+            for (const hour of hours) {
+                const hourStart = Number(hour?.forecastStart);
+                const amount = finiteNonNegative(hour?.precipitationAmount);
+                if (!Number.isFinite(hourStart) || hourStart < forecastStart || hourStart >= forecastEnd || amount <= 0) continue;
+
+                const precipitationType = precipitationTypeForHour(hour, day);
+                const totals = amountByType.get(precipitationType) ?? { expected: 0, expectedSnow: 0 };
+                totals.expected += amount;
+                totals.expectedSnow += finiteNonNegative(hour?.snowfallAmount);
+                amountByType.set(precipitationType, totals);
+            }
+
+            const hourlyTotal = [...amountByType.values()].reduce((sum, item) => sum + item.expected, 0);
+            if (hourlyTotal < DISPLAY_ZERO_THRESHOLD_MM) continue;
+
+            day.precipitationAmount = roundPrecipitation(hourlyTotal);
+            day.precipitationAmountByType = [...amountByType.entries()].map(([precipitationType, totals]) => ({
+                expected: roundPrecipitation(totals.expected),
+                expectedSnow: roundPrecipitation(totals.expectedSnow),
+                maximumSnow: 0,
+                minimumSnow: 0,
+                precipitationType,
+            }));
+            day.precipitationType = amountByType.size === 1 ? amountByType.keys().next().value : "MIXED";
+            repaired++;
+        }
+
+        return repaired;
     }
 
     static ConvertWeatherCode(skycon) {

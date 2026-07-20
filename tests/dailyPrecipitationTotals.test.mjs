@@ -65,6 +65,51 @@ test("ColorfulClouds still replaces supported daily fields", async () => {
     assert.equal(appleDay.precipitationAmount, 19);
 });
 
+test("daily total displayed as zero is repaired from hours in the same forecast day", () => {
+    const forecastStart = 1_784_092_800;
+    const day = {
+        conditionCode: "RAIN",
+        forecastStart,
+        forecastEnd: forecastStart + 24 * 3600,
+        precipitationAmount: 0.2,
+        precipitationAmountByType: [],
+        precipitationType: "RAIN",
+    };
+    const hours = [
+        { conditionCode: "RAIN", forecastStart: forecastStart - 3600, precipitationAmount: 10, precipitationType: "RAIN" },
+        { conditionCode: "RAIN", forecastStart, precipitationAmount: 0.25, precipitationType: "RAIN" },
+        { conditionCode: "HEAVY_RAIN", forecastStart: forecastStart + 3600, precipitationAmount: 0.5, precipitationType: "RAIN" },
+        { conditionCode: "RAIN", forecastStart: day.forecastEnd, precipitationAmount: 10, precipitationType: "RAIN" },
+    ];
+
+    assert.equal(Weather.repairDailyPrecipitationTotals([day], hours), 1);
+    assert.equal(day.precipitationAmount, 0.75);
+    assert.deepEqual(day.precipitationAmountByType, [
+        {
+            expected: 0.75,
+            expectedSnow: 0,
+            maximumSnow: 0,
+            minimumSnow: 0,
+            precipitationType: "RAIN",
+        },
+    ]);
+});
+
+test("daily precipitation fallback does not overwrite a normal daily total", () => {
+    const forecastStart = 1_784_092_800;
+    const day = {
+        forecastStart,
+        forecastEnd: forecastStart + 24 * 3600,
+        precipitationAmount: 8,
+        precipitationAmountByType: [{ expected: 8, precipitationType: "RAIN" }],
+    };
+    const hours = [{ forecastStart, precipitationAmount: 20, precipitationType: "RAIN" }];
+
+    assert.equal(Weather.repairDailyPrecipitationTotals([day], hours), 0);
+    assert.equal(day.precipitationAmount, 8);
+    assert.deepEqual(day.precipitationAmountByType, [{ expected: 8, precipitationType: "RAIN" }]);
+});
+
 function assertProviderDoesNotSupplyUnpairedAmounts(day) {
     assert.equal(Object.hasOwn(day, "precipitationAmount"), false);
     assert.equal(Object.hasOwn(day.daytimeForecast, "precipitationAmount"), false);
