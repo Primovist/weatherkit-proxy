@@ -32,14 +32,15 @@
         "dev:workers": "npm run dev:wrangler",
         "dev:vercel": "npx -y vercel dev",
         "dev:wrangler": "node ./node_modules/wrangler/bin/wrangler.js dev",
-        "deploy:pages": "node ./node_modules/wrangler/bin/wrangler.js pages deploy pages -c wrangler.pages.jsonc",
+        "deploy:pages": "npm run build && node ./node_modules/wrangler/bin/wrangler.js pages deploy pages -c wrangler.pages.jsonc",
         "deploy:workers": "npm run deploy:wrangler",
         "deploy:vercel": "npx vercel deploy --prod",
-        "deploy:wrangler": "node ./node_modules/wrangler/bin/wrangler.js deploy --minify",
-        "build": "echo 'No build step required'",
+        "deploy:wrangler": "npm run build && node ./node_modules/wrangler/bin/wrangler.js deploy --minify",
+        "build": "node scripts/write-deployment-time.mjs",
         "test": "node --test",
         "submodule": "git submodule update --remote",
-        "update": "npm update --save"
+        "update": "npm update --save",
+        "vercel-build": "npm run build"
     },
     "browserslist": [
         "iOS >= 18"

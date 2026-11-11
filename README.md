@@ -10,6 +10,8 @@
 
 ## 🚀 部署指南
 
+每次部署构建会生成一次北京时间，写入客户端配置的日期字段；同一次部署的多次下载和不同运行实例使用相同时间。未运行构建脚本时将省略日期字段。`npm run build` 仅生成这个时间文件，不进行代码打包；本地执行时会改写 `src/function/deploymentTime.mjs`。
+
 ### 部署到 Cloudflare Workers
 
 #### 方式 1：通过 Cloudflare 网页后台部署
@@ -17,7 +19,7 @@
 2. 依次进入 **Workers 和 Pages** -> **创建** -> **克隆 Git 存储库**。
 3. 在 **Git 存储库 URL** 输入框中，直接填入本项目的 Git 地址：
    `https://github.com/meme-lau/weatherkit-proxy.git`
-4. 点击 **下一步**，Cloudflare 将在云端自动完成打包构建并为您分配部署的 Workers 域名。
+4. 在构建设置中将 **Build command** 设为 `npm run build`，将 **Deploy command** 设为 `npx wrangler deploy --minify`，然后部署。已有项目也需在 Worker 的 **Settings → Build** 中设置构建命令。
 
 #### 方式 2：通过本地命令行部署（适合开发者）
 ##### 1. 准备工作
@@ -49,6 +51,8 @@ npm run deploy:wrangler
 ```bash
 npm run deploy:pages
 ```
+
+通过 Cloudflare Pages 连接 Git 仓库时，请将构建命令设置为 `npm run build`，构建输出目录设置为 `pages`。
 
 本地调试 Pages Functions 可运行 `npm run dev:pages`。
 

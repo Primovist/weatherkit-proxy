@@ -7,21 +7,11 @@ import buildSettings from "./function/buildSettings.mjs";
 import { decodeConfigPayload } from "./function/configPayload.mjs";
 import configs, { renderClientConfig } from "./function/configs/index.mjs";
 import database from "./function/database.mjs";
+import deploymentTime from "./function/deploymentTime.mjs";
 import { renderIndex } from "./function/indexPage.mjs";
 import parseWeatherKitURL from "./function/parseWeatherKitURL.mjs";
 import { Response } from "./process/Response.mjs";
 import { fetch, merge, requestContext, set } from "./utils/index.mjs";
-
-function getCSTDateString() {
-    const d = new Date(Date.now() + 8 * 60 * 60 * 1000);
-    const year = d.getUTCFullYear();
-    const month = String(d.getUTCMonth() + 1).padStart(2, "0");
-    const day = String(d.getUTCDate()).padStart(2, "0");
-    const hours = String(d.getUTCHours()).padStart(2, "0");
-    const minutes = String(d.getUTCMinutes()).padStart(2, "0");
-    const seconds = String(d.getUTCSeconds()).padStart(2, "0");
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-}
 
 const app = new Hono();
 
@@ -83,10 +73,11 @@ async function handleConfigDownload(c, filename, configParam) {
         }
     }
     const configContent = renderClientConfig(filenameParam, proxyAirQualityScale);
+    // 先处理模板中的日期，避免误改用户配置中的同名文本。
+    const datedContent = deploymentTime ? configContent.replaceAll("__DATE__", deploymentTime) : configContent.replace(/^.*__DATE__.*(?:\r?\n|$)/gm, "");
 
     // 获取当前的主机名
     const host = c.req.header("host");
-    const cstDateString = getCSTDateString();
 
     let targetHost = host;
     if (configParam) {
@@ -97,11 +88,10 @@ async function handleConfigDownload(c, filename, configParam) {
     // __HOST__：携带 base64 配置路径（host/p/<config>），供 weather 与 weatherAlerts 等逐用户配置接口使用；
     // __PLAIN_HOST__：裸主机（不含配置路径），availability/airQualityScale 等无需配置的接口使用。
     const domainOnly = host.split(":")[0];
-    let content = configContent.replaceAll("__PLAIN_HOST__", host);
+    let content = datedContent.replaceAll("__PLAIN_HOST__", host);
     content = content.replaceAll("__HOST__", targetHost);
     content = content.replaceAll("__DOMAIN__", domainOnly);
     content = content.replaceAll("__DOMAIN_POLICY__", formatDomainPolicy(filenameParam, domainPolicy));
-    content = content.replaceAll("__DATE__", cstDateString);
 
     c.header("Content-Type", "text/plain; charset=utf-8");
     c.header("Content-Disposition", `attachment; filename="${filenameParam}"`);
